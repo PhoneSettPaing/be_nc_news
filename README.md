@@ -1,3 +1,4 @@
 # NC News Seeding
 
-- Instructions for this sprint can be found at https://l2c.northcoders.com/courses/be/seeding-nc-news
+- Create two .env files to connect to development database and test database (.env.test & .env.development)
+- Inside each file write PGDATABASE = name_of_your_database;
