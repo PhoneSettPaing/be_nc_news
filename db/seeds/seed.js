@@ -1,6 +1,6 @@
 const db = require("../connection");
 const format = require("pg-format");
-const { convertTimestampToDate, getArticleID } = require("./utils");
+const { convertTimestampToDate, createRef } = require("./utils");
 
 const seed = ({ topicData, userData, articleData, commentData }) => {
   return db
@@ -80,35 +80,57 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
         ];
       });
       const insertArticleQuery = format(
-        `INSERT INTO articles (title, topic, author, body, created_at, votes, article_img_url) VALUES %L`,
+        `INSERT INTO articles (title, topic, author, body, created_at, votes, article_img_url) VALUES %L RETURNING *`,
         formattedArticleData
       );
       return db.query(insertArticleQuery);
     })
-    .then(() => {
-      const formattedCommentData = commentData.map((comment) => {
-        return getArticleID(comment).then((data) => {
-          const newComment = convertTimestampToDate(comment);
-          //getting article_id
-          const article_id = data.rows[0].article_id;
-          //console.log(article_id, "<----getArticleID");
-          return [
-            article_id,
-            newComment.body,
-            newComment.votes,
-            newComment.author,
-            newComment.created_at,
-          ];
-        });
+    .then((result) => {
+      const articlesRefObject = createRef(result.rows);
+      const formattedComments = commentData.map((comment) => {
+        const legitComment = convertTimestampToDate(comment);
+        
+        return [
+          articlesRefObject[comment.article_title],
+          legitComment.body,
+          legitComment.votes,
+          legitComment.author,
+          legitComment.created_at,
+        ];
       });
-      return Promise.all(formattedCommentData).then((data) => {
-        //console.log(data, "<---afterPromise");
-        const insertCommentQuery = format(
-          `INSERT INTO comments (article_id, body, votes, author, created_at) VALUES %L`,
-          data
-        );
-        return db.query(insertCommentQuery);
-      });
-    }); //<< write your first query in here.
+
+      const insertCommentQuery = format(
+        `INSERT INTO comments (article_id, body, votes, author, created_at) VALUES %L`,
+        formattedComments
+      );
+
+      return db.query(insertCommentQuery);
+    });
+  // .then(() => {
+  //   const formattedCommentData = commentData.map((comment) => {
+  //     return getArticleID(comment).then((data) => {
+  //       const newComment = convertTimestampToDate(comment);
+  //       //getting article_id
+  //       const article_id = data.rows[0].article_id;
+  //       //console.log(article_id, "<----getArticleID");
+  //       return [
+  //         article_id,
+  //         newComment.body,
+  //         newComment.votes,
+  //         newComment.author,
+  //         newComment.created_at,
+  //       ];
+  //     });
+  //   });
+  //   return Promise.all(formattedCommentData).then((data) => {
+  //     //console.log(data, "<---afterPromise");
+  //     const insertCommentQuery = format(
+  //       `INSERT INTO comments (article_id, body, votes, author, created_at) VALUES %L`,
+  //       data
+  //     );
+  //     return db.query(insertCommentQuery);
+  //   });
+  // }); //The code works but forget to write tests for utils function and code looks more complex than from lecture
+  // //<< write your first query in here.
 };
 module.exports = seed;
