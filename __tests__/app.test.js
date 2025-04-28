@@ -12,12 +12,12 @@ beforeEach(() => seed(data));
 afterAll(() => db.end());
 
 describe("Bad URL errors", () => {
-  test("404: Responds with Not Found! msg", () => {
+  test("404: Responds with Invalid Url! msg", () => {
     return request(app)
       .get("/NotAValidUrl")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Not Found!");
+        expect(msg).toBe("Invalid Url!");
       });
   });
 });
@@ -29,6 +29,24 @@ describe("GET /api", () => {
       .expect(200)
       .then(({ body: { endpoints } }) => {
         expect(endpoints).toEqual(endpointsJson);
+      });
+  });
+});
+
+describe("GET /api/topics", () => {
+  test("200: Responds with an array of topic objects", () => {
+    return request(app)
+      .get("/api/topics")
+      .expect(200)
+      .then(({ body: { topics } }) => {
+        expect(topics.length).toBe(3);
+        topics.forEach((topic) => {
+          expect(topic).toMatchObject({
+            description: expect.any(String),
+            slug: expect.any(String),
+            img_url: expect.any(String),
+          });
+        });
       });
   });
 });
