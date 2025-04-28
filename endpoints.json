@@ -1,4 +1,7 @@
 {
+  "ALL /*url": {
+    "description": "catch all unvalid bad url and throw 404 Not Found! error"
+  },
   "GET /api": {
     "description": "serves up a json representation of all the available endpoints of the api"
   },
