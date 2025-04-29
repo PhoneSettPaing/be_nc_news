@@ -78,5 +78,18 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "Insert a comment to the provide article_id",
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 19,
+        "article_id": 6,
+        "body": "Nice article",
+        "votes": 0,
+        "author": "icellusedkars",
+        "created_at": "2025-04-29T15:04:18.888Z"
+      }
+    }
   }
 }
