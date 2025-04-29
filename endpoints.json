@@ -9,14 +9,28 @@
     "description": "serves an array of all topics",
     "queries": [],
     "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
+      "topics": [
+        { "slug": "football", "description": "Footie!", "img_url": "" },
+        { "slug": "cats", "description": "Not dogs", "img_url": "" }
+      ]
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles",
+    "description": "serves an array of all articles sorted by date in descending order",
     "exampleResponse": {
       "articles": [
         {
+          "article_id": 6,
+          "title": "A",
+          "topic": "mitch",
+          "author": "icellusedkars",
+          "created_at": "2020-10-18T01:00:00.000Z",
+          "votes": 0,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          "comment_count": 1
+        },
+        {
+          "article_id": 4,
           "title": "Seafood substitutions are increasing",
           "topic": "cooking",
           "author": "weegembump",
@@ -40,6 +54,29 @@
         "votes": 0,
         "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
       }
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves an array of comments object filter by the provide article_id order by date",
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 15,
+          "article_id": 5,
+          "body": "I am 100% sure that we're not completely sure.",
+          "votes": 1,
+          "author": "butter_bridge",
+          "created_at": "2020-11-24T00:08:00.000Z"
+        },
+        {
+          "comment_id": 14,
+          "article_id": 5,
+          "body": "What do you see? I have no idea where this will lead us. This place I speak of, is known as the Black Lodge.",
+          "votes": 16,
+          "author": "icellusedkars",
+          "created_at": "2020-06-09T05:00:00.000Z"
+        }
+      ]
     }
   }
 }

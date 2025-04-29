@@ -3,9 +3,11 @@ const express = require("express");
 const app = express();
 const { getApi, badUrl } = require("./controllers/api.controller");
 const { getTopics } = require("./controllers/topics.controller");
-const { getArticleById, getArticles } = require("./controllers/articles.controller");
-
-//app.use(express.json());
+const {
+  getArticleById,
+  getArticles,
+} = require("./controllers/articles.controller");
+const { getCommentsByArticleId } = require("./controllers/comments.controller");
 
 app.get("/api", getApi);
 
@@ -14,6 +16,8 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getArticleById);
 
 app.get("/api/articles", getArticles);
+
+app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.all("/*splat", badUrl);
 //End of express chain
@@ -40,7 +44,7 @@ app.use((err, req, res, next) => {
 
 // 500 handler
 app.use((err, req, res, next) => {
-  //console.log(err, "<--in 500 Handler");
+  console.log(err, "Unhandled Error");
   res.status(500).send({ msg: "Internal Server Error!" });
 });
 
