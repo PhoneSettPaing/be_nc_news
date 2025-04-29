@@ -89,7 +89,7 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       const articlesRefObject = createRef(result.rows);
       const formattedComments = commentData.map((comment) => {
         const legitComment = convertTimestampToDate(comment);
-        
+
         return [
           articlesRefObject[comment.article_title],
           legitComment.body,
@@ -106,31 +106,5 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
 
       return db.query(insertCommentQuery);
     });
-  // .then(() => {
-  //   const formattedCommentData = commentData.map((comment) => {
-  //     return getArticleID(comment).then((data) => {
-  //       const newComment = convertTimestampToDate(comment);
-  //       //getting article_id
-  //       const article_id = data.rows[0].article_id;
-  //       //console.log(article_id, "<----getArticleID");
-  //       return [
-  //         article_id,
-  //         newComment.body,
-  //         newComment.votes,
-  //         newComment.author,
-  //         newComment.created_at,
-  //       ];
-  //     });
-  //   });
-  //   return Promise.all(formattedCommentData).then((data) => {
-  //     //console.log(data, "<---afterPromise");
-  //     const insertCommentQuery = format(
-  //       `INSERT INTO comments (article_id, body, votes, author, created_at) VALUES %L`,
-  //       data
-  //     );
-  //     return db.query(insertCommentQuery);
-  //   });
-  // }); //The code works but forget to write tests for utils function and code looks more complex than from lecture
-  // //<< write your first query in here.
 };
 module.exports = seed;
