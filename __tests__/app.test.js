@@ -162,3 +162,72 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201: Respond with the added comment", () => {
+    const postObj = {
+      username: "lurker",
+      body: "Nice article",
+    };
+
+    return request(app)
+      .post("/api/articles/6/comments")
+      .send(postObj)
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment).toMatchObject({
+          comment_id: expect.any(Number),
+          article_id: 6,
+          body: expect.any(String),
+          votes: expect.any(Number),
+          author: expect.any(String),
+          created_at: expect.any(String),
+        });
+      });
+  });
+
+  test("404: Respond with username Not Found! msg when trying to add comment with invalid username", () => {
+    const postObj = {
+      username: "NotAUsername",
+      body: "Nice article",
+    };
+
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(postObj)
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("username Not Found!");
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when trying to add comment to invalid article_id", () => {
+    const postObj = {
+      username: "lurker",
+      body: 12345,
+    };
+
+    return request(app)
+      .post("/api/articles/NotAnArticleId/comments")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("404: Respond with article_id Not Found! msg when trying to add comment to valid article_id but not exist in database", () => {
+    const postObj = {
+      username: "lurker",
+      body: 12345,
+    };
+
+    return request(app)
+      .post("/api/articles/5000/comments")
+      .send(postObj)
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("article_id Not Found!");
+      });
+  });
+});
