@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const format = require("pg-format");
 
 exports.selectArticleById = (article_id) => {
   return db
@@ -11,14 +12,32 @@ exports.selectArticleById = (article_id) => {
     });
 };
 
-exports.selectArticles = () => {
-  return db
-    .query(
-      `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id)::INT AS comment_count FROM articles LEFT JOIN comments on articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY articles.created_at DESC;`
-    )
-    .then(({ rows }) => {
+exports.selectArticles = (sort_by, order) => {
+  const validSort = [
+    "article_id",
+    "title",
+    "topic",
+    "author",
+    "created_at",
+    "votes",
+    "article_img_url",
+    "comment_count",
+  ];
+  const validOrder = ["asc", "desc"];
+
+  if (!validSort.includes(sort_by) || !validOrder.includes(order)) {
+    return Promise.reject({ status: 400, msg: "Bad Request!" });
+  } else {
+    const queryString = format(
+      "SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id)::INT AS comment_count FROM articles LEFT JOIN comments on articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY %I %s;",
+      sort_by,
+      order
+    );
+
+    return db.query(queryString).then(({ rows }) => {
       return rows;
     });
+  }
 };
 
 exports.updateArticleById = (article_id, inc_votes) => {

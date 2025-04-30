@@ -1,3 +1,4 @@
+const { includes } = require("../db/data/test-data/articles");
 const {
   selectArticleById,
   selectArticles,
@@ -14,9 +15,21 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res) => {
-  return selectArticles().then((articles) => {
-    res.status(200).send({ articles });
-  });
+  const queryKeys = Object.keys(req.query);
+
+  if (
+    queryKeys.includes("sort_by") ||
+    queryKeys.includes("order") ||
+    queryKeys.length === 0
+  ) {
+    const { sort_by = "created_at", order = "desc" } = req.query;
+
+    return selectArticles(sort_by, order).then((articles) => {
+      res.status(200).send({ articles });
+    });
+  } else {
+    return Promise.reject({ status: 400, msg: "Bad Request!" });
+  }
 };
 
 exports.patchArticleById = (req, res, next) => {
