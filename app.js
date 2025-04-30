@@ -6,6 +6,7 @@ const { getTopics } = require("./controllers/topics.controller");
 const {
   getArticleById,
   getArticles,
+  patchArticleById,
 } = require("./controllers/articles.controller");
 const {
   getCommentsByArticleId,
@@ -25,6 +26,8 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.post("/api/articles/:article_id/comments", postCommentByArticleId);
+
+app.patch("/api/articles/:article_id", patchArticleById);
 
 app.all("/*splat", badUrl);
 //End of express chain

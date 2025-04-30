@@ -21,6 +21,10 @@ exports.postCommentByArticleId = (req, res, next) => {
   const { username, body } = req.body;
   const { article_id } = req.params;
 
+  if (!username || !body) {
+    return Promise.reject({ status: 400, msg: "Bad Request!!" });
+  }
+
   const pendingUserCheck = checkUser(username);
   const pendingArticleIdCheck = selectArticleById(article_id);
 
