@@ -272,7 +272,7 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
 });
 
-describe("Patch /api/articles/:article_id", () => {
+describe("PATCH /api/articles/:article_id", () => {
   describe("Positive votes", () => {
     test("200: Respond with an updated article object with updated votes for given article_id", () => {
       const patchObj = {
@@ -376,6 +376,30 @@ describe("Patch /api/articles/:article_id", () => {
       .expect(400)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Bad Request!!");
+      });
+  });
+});
+
+describe.only("DELETE /api/comments/:comment_id", () => {
+  test("204: When comment deleted successfully", () => {
+    return request(app).delete("/api/comments/2").expect(204);
+  });
+
+  test("400: Respond with Bad Request! When unvalid comment_id is given", () => {
+    return request(app)
+      .delete("/api/comments/NotCommentId")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("404: Respond with comment_id Not Found! msg when given comment_id is valid but out of range", () => {
+    return request(app)
+      .delete("/api/comments/2000")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("comment_id Not Found!");
       });
   });
 });

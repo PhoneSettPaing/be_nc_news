@@ -21,3 +21,15 @@ exports.insertCommentByArticleId = (article_id, body) => {
       return rows[0];
     });
 };
+
+exports.deleteCommentWithId = (comment_id) => {
+  return db
+    .query(`DELETE FROM comments WHERE comment_id = $1 RETURNING *;`, [
+      comment_id,
+    ])
+    .then(({ rows }) => {
+      if (!rows.length) {
+        return Promise.reject({ status: 404, msg: "comment_id Not Found!" });
+      }
+    });
+};
