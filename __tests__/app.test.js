@@ -815,3 +815,28 @@ describe("GET /api/users", () => {
       });
   });
 });
+
+describe("GET /api/users/:username", () => {
+  test("200: Respond with object of user information filtered by provided username", () => {
+    return request(app)
+      .get("/api/users/rogersop")
+      .expect(200)
+      .then(({ body: { user } }) => {
+        expect(user).toMatchObject({
+          username: "rogersop",
+          name: "paul",
+          avatar_url:
+            "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+        });
+      });
+  });
+
+  test("404: Respond with username Not Found! when provided username not in database", () => {
+    return request(app)
+      .get("/api/users/NoUsername")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("username Not Found!");
+      });
+  });
+});
