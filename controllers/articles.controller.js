@@ -7,20 +7,20 @@ const { checkTopic } = require("../models/topics.model");
 
 exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params;
-  const { comment_count } = req.query;
+    const { comment_count } = req.query;
 
-  if (
-    Object.keys(req.query).length === 0 ||
-    Object.keys(req.query).includes("comment_count")
-  ) {
-    return selectArticleById(article_id, comment_count)
-      .then((article) => {
-        res.status(200).send({ article });
-      })
-      .catch(next);
-  } else {
-    return Promise.reject({ status: 400, msg: "Bad Request!" });
-  }
+    if (
+      Object.keys(req.query).length === 0 ||
+      Object.keys(req.query).includes("comment_count")
+    ) {
+      return selectArticleById(article_id, comment_count)
+        .then((article) => {
+          res.status(200).send({ article });
+        })
+        .catch(next);
+    } else {
+      return Promise.reject({ status: 400, msg: "Bad Request!" });
+    }
 };
 
 exports.getArticles = (req, res, next) => {
