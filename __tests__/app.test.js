@@ -91,54 +91,54 @@ describe("GET /api/articles/:article_id", () => {
     });
   });
 
-  describe("GET /api/articles/:article_id?comment_count", () => {
-    test("200: Responds with object of article information  including comment_count filtered by provide article_id", () => {
-      return request(app)
-        .get("/api/articles/4?comment_count")
-        .expect(200)
-        .then(({ body: { article } }) => {
-          expect(article).toMatchObject({
-            article_id: 4,
-            title: "Student SUES Mitch!",
-            topic: "mitch",
-            author: "rogersop",
-            body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
-            created_at: "2020-05-06T01:14:00.000Z",
-            votes: 0,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-            comment_count: expect.any(Number),
+    describe("GET /api/articles/:article_id?comment_count", () => {
+      test("200: Responds with object of article information  including comment_count filtered by provide article_id", () => {
+        return request(app)
+          .get("/api/articles/4?comment_count")
+          .expect(200)
+          .then(({ body: { article } }) => {
+            expect(article).toMatchObject({
+              article_id: 4,
+              title: "Student SUES Mitch!",
+              topic: "mitch",
+              author: "rogersop",
+              body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+              created_at: "2020-05-06T01:14:00.000Z",
+              votes: 0,
+              article_img_url:
+                "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+              comment_count: expect.any(Number),
+            });
           });
-        });
-    });
+      });
 
-    test("400: Responds with Bad Request! msg When unvaild query is given", () => {
-      return request(app)
-        .get("/api/articles/4?NotVaildQuery")
-        .expect(400)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("Bad Request!");
-        });
-    });
+      test("400: Responds with Bad Request! msg When unvaild query is given", () => {
+        return request(app)
+          .get("/api/articles/4?NotVaildQuery")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
 
-    test("404: Respond with article_id Not Found! msg when valid article_id provided but id being out of range", () => {
-      return request(app)
-        .get("/api/articles/10000?comment_count")
-        .expect(404)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("article_id Not Found!");
-        });
-    });
+      test("404: Respond with article_id Not Found! msg when valid article_id provided but id being out of range", () => {
+        return request(app)
+          .get("/api/articles/10000?comment_count")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("article_id Not Found!");
+          });
+      });
 
-    test("400: Respond with Bad Request! msg when invalid article_id provided", () => {
-      return request(app)
-        .get("/api/articles/NotArticleId?comment_count")
-        .expect(400)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("Bad Request!");
-        });
+      test("400: Respond with Bad Request! msg when invalid article_id provided", () => {
+        return request(app)
+          .get("/api/articles/NotArticleId?comment_count")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
     });
-  });
 });
 
 describe("GET /api/articles", () => {
