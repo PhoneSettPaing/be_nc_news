@@ -8,7 +8,7 @@ exports.getUsers = (req, res) => {
 
 exports.getUserByUsername = (req, res, next) => {
   const { username } = req.params;
-  console.log(req.params)
+
   return checkUser(username)
     .then((user) => {
       res.status(200).send({ user });
