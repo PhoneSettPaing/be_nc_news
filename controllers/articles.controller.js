@@ -1,9 +1,9 @@
-const { includes } = require("../db/data/test-data/articles");
 const {
   selectArticleById,
   selectArticles,
   updateArticleById,
 } = require("../models/articles.model");
+const { checkTopic } = require("../models/topics.model");
 
 exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params;
@@ -14,19 +14,33 @@ exports.getArticleById = (req, res, next) => {
     .catch(next);
 };
 
-exports.getArticles = (req, res) => {
+exports.getArticles = (req, res, next) => {
   const queryKeys = Object.keys(req.query);
 
   if (
     queryKeys.includes("sort_by") ||
     queryKeys.includes("order") ||
+    queryKeys.includes("topic") ||
     queryKeys.length === 0
   ) {
-    const { sort_by = "created_at", order = "desc" } = req.query;
+    const { sort_by = "created_at", order = "desc", topic } = req.query;
 
-    return selectArticles(sort_by, order).then((articles) => {
-      res.status(200).send({ articles });
-    });
+    if (topic) {
+      const pendingTopicCheck = checkTopic(topic);
+      const pendingArticles = selectArticles(sort_by, order, topic);
+
+      Promise.all([pendingArticles, pendingTopicCheck])
+        .then(([articles]) => {
+          res.status(200).send({ articles });
+        })
+        .catch(next);
+    } else {
+      return selectArticles(sort_by, order)
+        .then((articles) => {
+          res.status(200).send({ articles });
+        })
+        .catch(next);
+    }
   } else {
     return Promise.reject({ status: 400, msg: "Bad Request!" });
   }

@@ -874,3 +874,111 @@ describe("GET /api/articles (sorting queries)", () => {
     });
   });
 });
+
+describe("GET /api/articles (topic query)", () => {
+  test("200: Responds with an array of article objects filtered by the given topic and default sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBeGreaterThan(0);
+        articles.forEach((topic) => {
+          expect(topic).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: "mitch",
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
+        expect(articles).toBeSortedBy("created_at", { descending: true })
+      });
+  });
+
+  test("200: Respond with an array of all article objects when filtered by empty topic and default sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles?topic=")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBe(13);
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+
+  test("200: Respond with an array of article objects when filtered by mitch topic and sorted by author in ascending order", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=author&order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBeGreaterThan(0);
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: "mitch",
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
+        expect(articles).toBeSortedBy("author");
+      });
+  });
+
+  test("200: Respond with an array of all article objects when filtered by empty topic and sorted by title in ascending order", () => {
+    return request(app)
+      .get("/api/articles?topic=&sort_by=title&order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBeGreaterThan(0);
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
+        expect(articles).toBeSortedBy("title");
+      });
+  });
+
+  test("200: Resopnd with an empty array when given topic does not have any articles", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toEqual([]);
+      });
+  });
+
+  test("404: Respond wiht topic Not found! msg when filtered by topic not in database", () => {
+    return request(app)
+      .get("/api/articles?topic=NotIncludedTopic")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("topic Not Found!");
+      });
+  });
+});
