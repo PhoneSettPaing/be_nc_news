@@ -44,6 +44,7 @@
   },
   "GET /api/articles/:article_id": {
     "description": "serves an object of article information filter by the provide article_id",
+    "queries": ["comment_count"],
     "exampleResponse": {
       "article": {
         "article_id": 4,
