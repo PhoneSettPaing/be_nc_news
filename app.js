@@ -13,7 +13,7 @@ const {
   postCommentByArticleId,
   deleteCommentById,
 } = require("./controllers/comments.controller");
-const { getUsers } = require("./controllers/users.controller");
+const { getUsers, getUserByUsername } = require("./controllers/users.controller");
 
 app.use(express.json());
 
@@ -34,6 +34,8 @@ app.patch("/api/articles/:article_id", patchArticleById);
 app.delete("/api/comments/:comment_id", deleteCommentById);
 
 app.get("/api/users", getUsers);
+
+app.get("/api/users/:username", getUserByUsername);
 
 app.all("/*splat", badUrl);
 //End of express chain
