@@ -12,7 +12,7 @@ exports.selectArticleById = (article_id) => {
     });
 };
 
-exports.selectArticles = (sort_by, order) => {
+exports.selectArticles = (sort_by, order, topic) => {
   const validSort = [
     "article_id",
     "title",
@@ -25,16 +25,24 @@ exports.selectArticles = (sort_by, order) => {
   ];
   const validOrder = ["asc", "desc"];
 
+  let queryString =
+    "SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id)::INT AS comment_count FROM articles LEFT JOIN comments on articles.article_id = comments.article_id ";
+
   if (!validSort.includes(sort_by) || !validOrder.includes(order)) {
     return Promise.reject({ status: 400, msg: "Bad Request!" });
-  } else {
-    const queryString = format(
-      "SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id)::INT AS comment_count FROM articles LEFT JOIN comments on articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY %I %s;",
-      sort_by,
-      order
-    );
+  } else if (topic) {
+    queryString +=
+      "WHERE topic = %L GROUP BY articles.article_id ORDER BY %I %s;";
+    const formattedQuery = format(queryString, topic, sort_by, order);
 
-    return db.query(queryString).then(({ rows }) => {
+    return db.query(formattedQuery).then(({ rows }) => {
+      return rows;
+    });
+  } else {
+    queryString += "GROUP BY articles.article_id ORDER BY %I %s;";
+    const formattedQuery = format(queryString, sort_by, order);
+
+    return db.query(formattedQuery).then(({ rows }) => {
       return rows;
     });
   }
