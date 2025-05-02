@@ -2,6 +2,7 @@ const {
   selectArticleById,
   selectArticles,
   updateArticleById,
+  insertArticle,
 } = require("../models/articles.model");
 const { checkTopic } = require("../models/topics.model");
 
@@ -66,6 +67,15 @@ exports.patchArticleById = (req, res, next) => {
   return updateArticleById(article_id, inc_votes)
     .then((article) => {
       res.status(200).send({ article });
+    })
+    .catch(next);
+};
+
+exports.postArticle = (req, res, next) => {
+
+  return insertArticle(req.body)
+    .then((article) => {
+      res.status(201).send({ article });
     })
     .catch(next);
 };
