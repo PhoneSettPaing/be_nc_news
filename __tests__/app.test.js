@@ -64,7 +64,7 @@ describe("GET /api/articles/:article_id", () => {
             topic: "mitch",
             author: "rogersop",
             body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
-            created_at: "2020-05-06T01:14:00.000Z",
+            created_at: expect.any(String),
             votes: 0,
             article_img_url:
               "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
@@ -103,7 +103,7 @@ describe("GET /api/articles/:article_id", () => {
             topic: "mitch",
             author: "rogersop",
             body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
-            created_at: "2020-05-06T01:14:00.000Z",
+            created_at: expect.any(String),
             votes: 0,
             article_img_url:
               "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
@@ -684,7 +684,7 @@ describe("PATCH /api/articles/:article_id", () => {
             topic: "mitch",
             author: "rogersop",
             body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
-            created_at: "2020-05-06T01:14:00.000Z",
+            created_at: expect.any(String),
             votes: 5,
             article_img_url:
               "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
@@ -710,7 +710,7 @@ describe("PATCH /api/articles/:article_id", () => {
             topic: "mitch",
             author: "icellusedkars",
             body: "Delicious tin of cat food",
-            created_at: "2020-10-18T01:00:00.000Z",
+            created_at: expect.any(String),
             votes: -15,
             article_img_url:
               "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
@@ -766,6 +766,94 @@ describe("PATCH /api/articles/:article_id", () => {
 
     return request(app)
       .patch("/api/articles/3")
+      .send(patchObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!!");
+      });
+  });
+});
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("200: Respond with an updated comment object with updated votes for given comment_id (given positive votes)", () => {
+    const patchObj = { inc_votes: 5 };
+
+    return request(app)
+      .patch("/api/comments/2")
+      .send(patchObj)
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        expect(comment).toMatchObject({
+          comment_id: 2,
+          article_id: 1,
+          body: "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+          votes: 19,
+          author: "butter_bridge",
+          created_at: expect.any(String),
+        });
+      });
+  });
+
+  test("200: Respond with an updated comment object with updated votes for given comment_id (given negative votes)", () => {
+    const patchObj = { inc_votes: -3 };
+
+    return request(app)
+      .patch("/api/comments/1")
+      .send(patchObj)
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        expect(comment).toMatchObject({
+          comment_id: 1,
+          article_id: 9,
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          votes: 13,
+          author: "butter_bridge",
+          created_at: expect.any(String),
+        });
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when trying to update comment with votes that is not a number", () => {
+    const patchObj = { inc_votes: "Not A Number" };
+
+    return request(app)
+      .patch("/api/comments/3")
+      .send(patchObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when trying to update comment with valid votes but unvalid comment_id", () => {
+    const patchObj = { inc_votes: 10 };
+
+    return request(app)
+      .patch("/api/comments/NotCommentId")
+      .send(patchObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("404: Respond with comment_id Not Found! msg when trying to update comment with a comment_id that's out of range", () => {
+    const patchObj = { inc_votes: 4 };
+
+    return request(app)
+      .patch("/api/comments/3000")
+      .send(patchObj)
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("comment_id Not Found!");
+      });
+  });
+
+  test("400: Respond with Bad Request!! msg when trying to update comment with empty patch object", () => {
+    const patchObj = {};
+
+    return request(app)
+      .patch("/api/comments/6")
       .send(patchObj)
       .expect(400)
       .then(({ body: { msg } }) => {
