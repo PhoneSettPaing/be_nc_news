@@ -2,6 +2,7 @@ const {
   selectCommentsByArticleId,
   insertCommentByArticleId,
   deleteCommentWithId,
+  updateCommentById,
 } = require("../models/comments.model");
 const { selectArticleById } = require("../models/articles.model");
 const { checkUser } = require("../models/users.model");
@@ -38,10 +39,27 @@ exports.postCommentByArticleId = (req, res, next) => {
     .catch(next);
 };
 
-exports.deleteCommentById = (req, res) => {
+exports.deleteCommentById = (req, res, next) => {
   const { comment_id } = req.params;
 
-  return deleteCommentWithId(comment_id).then(() => {
-    res.status(204).send();
-  });
+  return deleteCommentWithId(comment_id)
+    .then(() => {
+      res.status(204).send();
+    })
+    .catch(next);
+};
+
+exports.patchCommentById = (req, res, next) => {
+  const { comment_id } = req.params;
+  const { inc_votes } = req.body;
+
+  if (!inc_votes) {
+    return Promise.reject({ status: 400, msg: "Bad Request!!" });
+  }
+
+  return updateCommentById(comment_id, inc_votes)
+    .then((comment) => {
+      res.status(200).send({ comment });
+    })
+    .catch(next);
 };

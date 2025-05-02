@@ -6,18 +6,6 @@ exports.convertTimestampToDate = ({ created_at, ...otherProperties }) => {
   return { created_at: new Date(created_at), ...otherProperties };
 };
 
-
-// exports.getArticleID = ({ article_title, ...otherProperties }) => {
-//   if (!article_title) {
-//     return { ...otherProperties };
-//   } else {
-//     const formattedArticleTitle = [article_title];
-//     const insertQuery = format(`SELECT article_id FROM articles WHERE title = %L` , formattedArticleTitle);
-//     //console.log(insertQuery, "<-----insertQuery");
-//     return db.query(insertQuery);
-//   }
-// }
-
 exports.createRef = (articlesData) => {
   if(articlesData.length === 0) {
     return {};
