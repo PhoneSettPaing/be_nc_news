@@ -508,6 +508,179 @@ describe("GET /api/articles", () => {
   });
 });
 
+describe("POST /api/articles", () => {
+  test("201: Respond with the added article", () => {
+    const postObj = {
+      author: "icellusedkars",
+      title: "Test Title",
+      body: "Test Body",
+      topic: "mitch",
+      article_img_url: "Test Image Url",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(postObj)
+      .expect(201)
+      .then(({ body: { article } }) => {
+        expect(article).toMatchObject({
+          article_id: expect.any(Number),
+          title: "Test Title",
+          topic: "mitch",
+          author: "icellusedkars",
+          body: "Test Body",
+          created_at: expect.any(String),
+          votes: 0,
+          article_img_url: "Test Image Url",
+          comment_count: 0,
+        });
+      });
+  });
+
+  test("201: Respond with the added article with default article_img_url when post object doesn't include it", () => {
+    const postObj = {
+      author: "rogersop",
+      title: "Test Title",
+      body: "Test Body",
+      topic: "cats",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(postObj)
+      .expect(201)
+      .then(({ body: { article } }) => {
+        expect(article).toMatchObject({
+          article_id: expect.any(Number),
+          title: "Test Title",
+          topic: "cats",
+          author: "rogersop",
+          body: "Test Body",
+          created_at: expect.any(String),
+          votes: 0,
+          article_img_url: "http://www.gravatar.com/avatar/?d=mp",
+          comment_count: 0,
+        });
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when trying to add an article with author(username) not included in database", () => {
+    const postObj = {
+      author: "NotIncludedAuthor",
+      title: "Test Title",
+      body: "Test Body",
+      topic: "mitch",
+      article_img_url: "Test Image Url",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when trying to add an article with topic(slug) not included in database", () => {
+    const postObj = {
+      author: "rogersop",
+      title: "Test Title",
+      body: "Test Body",
+      topic: "NotIncludedTopic",
+      article_img_url: "Test Image Url",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when post object is empty", () => {
+    const postObj = {};
+
+    return request(app)
+      .post("/api/articles")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when post object doesn't include author", () => {
+    const postObj = {
+      title: "Test Title",
+      body: "Test Body",
+      topic: "NotIncludedTopic",
+      article_img_url: "Test Image Url",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when post object doesn't include topic", () => {
+    const postObj = {
+      author: "rogersop",
+      title: "Test Title",
+      body: "Test Body",
+      article_img_url: "Test Image Url",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when post object doesn't include title", () => {
+    const postObj = {
+      author: "rogersop",
+      body: "Test Body",
+      topic: "mitch",
+      article_img_url: "Test Image Url",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when post object doesn't include body", () => {
+    const postObj = {
+      author: "rogersop",
+      title: "Test Title",
+      topic: "mitch",
+      article_img_url: "Test Image Url",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+});
+
 describe("GET /api/articles/:article_id/comments", () => {
   test("200: Responds with an array of comments for the given article_id sorted by date in descending order", () => {
     return request(app)

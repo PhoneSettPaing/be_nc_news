@@ -75,3 +75,20 @@ exports.updateArticleById = (article_id, inc_votes) => {
       return rows[0];
     });
 };
+
+exports.insertArticle = ({
+  author,
+  title,
+  body,
+  topic,
+  article_img_url = "http://www.gravatar.com/avatar/?d=mp",
+}) => {
+  return db
+    .query(
+      `INSERT INTO articles (author, title, body, topic, article_img_url) VALUES ( $1, $2, $3, $4, $5) RETURNING *;`,
+      [author, title, body, topic, article_img_url]
+    )
+    .then(({ rows }) => {
+      return this.selectArticleById(rows[0].article_id, (comment_count = ""));
+    });
+};
