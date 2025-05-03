@@ -5,7 +5,7 @@ exports.selectArticleById = (article_id, comment_count) => {
   if (comment_count !== undefined) {
     return db
       .query(
-        `SELECT articles.*, COUNT(comments.comment_id)::INT AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id;`,
+        `SELECT a.*, COUNT(c.comment_id)::INT AS comment_count FROM articles a LEFT JOIN comments c ON a.article_id = c.article_id WHERE a.article_id = $1 GROUP BY a.article_id;`,
         [article_id]
       )
       .then(({ rows }) => {
@@ -26,7 +26,7 @@ exports.selectArticleById = (article_id, comment_count) => {
   }
 };
 
-exports.selectArticles = (sort_by, order, topic) => {
+exports.selectArticles = (sort_by, order, topic, limit, p) => {
   const validSort = [
     "article_id",
     "title",
@@ -39,25 +39,43 @@ exports.selectArticles = (sort_by, order, topic) => {
   ];
   const validOrder = ["asc", "desc"];
 
-  let queryString =
-    "SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id)::INT AS comment_count FROM articles LEFT JOIN comments on articles.article_id = comments.article_id ";
+  const selectQuery =
+    "SELECT a.article_id, a.title, a.topic, a.author, a.created_at, a.votes, a.article_img_url, COUNT(c.comment_id)::INT AS comment_count FROM articles a LEFT JOIN comments c on a.article_id = c.article_id ";
+  const groupByOrderByQuery = format(
+    "GROUP BY a.article_id ORDER BY %I %s ",
+    sort_by,
+    order
+  );
+  const limitOffsetQuery = format("LIMIT %L OFFSET %L;", limit, p);
+  const countQuery = "SELECT COUNT(*)::INT FROM articles ";
 
   if (!validSort.includes(sort_by) || !validOrder.includes(order)) {
     return Promise.reject({ status: 400, msg: "Bad Request!" });
-  } else if (topic) {
-    queryString +=
-      "WHERE topic = %L GROUP BY articles.article_id ORDER BY %I %s;";
-    const formattedQuery = format(queryString, topic, sort_by, order);
+  }
 
-    return db.query(formattedQuery).then(({ rows }) => {
-      return rows;
+  if (topic) {
+    const whereQuery = format("WHERE topic = %L ", topic);
+
+    return Promise.all([
+      db.query(
+        selectQuery + whereQuery + groupByOrderByQuery + limitOffsetQuery
+      ),
+      db.query(countQuery + whereQuery),
+    ]).then(([topicResult, countResult]) => {
+      return {
+        articles: topicResult.rows,
+        total_count: countResult.rows[0].count,
+      };
     });
   } else {
-    queryString += "GROUP BY articles.article_id ORDER BY %I %s;";
-    const formattedQuery = format(queryString, sort_by, order);
-
-    return db.query(formattedQuery).then(({ rows }) => {
-      return rows;
+    return Promise.all([
+      db.query(selectQuery + groupByOrderByQuery + limitOffsetQuery),
+      db.query(countQuery),
+    ]).then(([articlesResult, countResult]) => {
+      return {
+        articles: articlesResult.rows,
+        total_count: countResult.rows[0].count,
+      };
     });
   }
 };
@@ -76,13 +94,7 @@ exports.updateArticleById = (article_id, inc_votes) => {
     });
 };
 
-exports.insertArticle = ({
-  author,
-  title,
-  body,
-  topic,
-  article_img_url = "http://www.gravatar.com/avatar/?d=mp",
-}) => {
+exports.insertArticle = (author, title, body, topic, article_img_url) => {
   return db
     .query(
       `INSERT INTO articles (author, title, body, topic, article_img_url) VALUES ( $1, $2, $3, $4, $5) RETURNING *;`,
