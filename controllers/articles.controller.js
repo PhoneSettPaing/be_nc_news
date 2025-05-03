@@ -25,34 +25,42 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  const queryKeys = Object.keys(req.query);
+  const {
+    sort_by = "created_at",
+    order = "desc",
+    topic,
+    limit = 10,
+    p = 1,
+  } = req.query;
 
-  if (
-    queryKeys.includes("sort_by") ||
-    queryKeys.includes("order") ||
-    queryKeys.includes("topic") ||
-    queryKeys.length === 0
-  ) {
-    const { sort_by = "created_at", order = "desc", topic } = req.query;
-
-    if (topic) {
-      const pendingTopicCheck = checkTopic(topic);
-      const pendingArticles = selectArticles(sort_by, order, topic);
-
-      Promise.all([pendingArticles, pendingTopicCheck])
-        .then(([articles]) => {
-          res.status(200).send({ articles });
-        })
-        .catch(next);
-    } else {
-      return selectArticles(sort_by, order)
-        .then((articles) => {
-          res.status(200).send({ articles });
-        })
-        .catch(next);
-    }
-  } else {
+  if (limit < 1 || p < 1) {
     return Promise.reject({ status: 400, msg: "Bad Request!" });
+  }
+
+  const maxlimit = Math.min(limit, 100);
+  const offset = limit * (p - 1);
+
+  if (topic) {
+    const pendingTopicCheck = checkTopic(topic);
+    const pendingArticles = selectArticles(
+      sort_by,
+      order,
+      topic,
+      maxlimit,
+      offset
+    );
+
+    Promise.all([pendingArticles, pendingTopicCheck])
+      .then(([result]) => {
+        res.status(200).send(result);
+      })
+      .catch(next);
+  } else {
+    return selectArticles(sort_by, order, topic, maxlimit, offset)
+      .then((result) => {
+        res.status(200).send(result);
+      })
+      .catch(next);
   }
 };
 
@@ -72,8 +80,15 @@ exports.patchArticleById = (req, res, next) => {
 };
 
 exports.postArticle = (req, res, next) => {
+  const {
+    author,
+    title,
+    body,
+    topic,
+    article_img_url = "http://www.gravatar.com/avatar/?d=mp",
+  } = req.body;
 
-  return insertArticle(req.body)
+  return insertArticle(author, title, body, topic, article_img_url)
     .then((article) => {
       res.status(201).send({ article });
     })

@@ -147,8 +147,9 @@ describe("GET /api/articles", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles.length).toBe(13);
+        .then(({ body: { articles, total_count } }) => {
+          expect(total_count).toBe(13);
+          expect(articles.length).toBe(10);
           articles.forEach((article) => {
             expect(article).toMatchObject({
               article_id: expect.any(Number),
@@ -172,8 +173,9 @@ describe("GET /api/articles", () => {
         return request(app)
           .get("/api/articles?sort_by=article_id")
           .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles.length).toBe(13);
+          .then(({ body: { articles, total_count } }) => {
+            expect(total_count).toBe(13);
+            expect(articles.length).toBe(10);
             articles.forEach((article) => {
               expect(article).toMatchObject({
                 article_id: expect.any(Number),
@@ -194,8 +196,9 @@ describe("GET /api/articles", () => {
         return request(app)
           .get("/api/articles?sort_by=title")
           .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles.length).toBe(13);
+          .then(({ body: { articles, total_count } }) => {
+            expect(total_count).toBe(13);
+            expect(articles.length).toBe(10);
             articles.forEach((article) => {
               expect(article).toMatchObject({
                 article_id: expect.any(Number),
@@ -216,8 +219,9 @@ describe("GET /api/articles", () => {
         return request(app)
           .get("/api/articles?sort_by=comment_count")
           .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles.length).toBe(13);
+          .then(({ body: { articles, total_count } }) => {
+            expect(total_count).toBe(13);
+            expect(articles.length).toBe(10);
             articles.forEach((article) => {
               expect(article).toMatchObject({
                 article_id: expect.any(Number),
@@ -242,8 +246,9 @@ describe("GET /api/articles", () => {
         return request(app)
           .get("/api/articles?order=asc")
           .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles.length).toBe(13);
+          .then(({ body: { articles, total_count } }) => {
+            expect(total_count).toBe(13);
+            expect(articles.length).toBe(10);
             articles.forEach((article) => {
               expect(article).toMatchObject({
                 article_id: expect.any(Number),
@@ -266,8 +271,9 @@ describe("GET /api/articles", () => {
         return request(app)
           .get("/api/articles?sort_by=author&order=asc")
           .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles.length).toBe(13);
+          .then(({ body: { articles, total_count } }) => {
+            expect(total_count).toBe(13);
+            expect(articles.length).toBe(10);
             articles.forEach((article) => {
               expect(article).toMatchObject({
                 article_id: expect.any(Number),
@@ -288,8 +294,9 @@ describe("GET /api/articles", () => {
         return request(app)
           .get("/api/articles?sort_by=created_at&order=asc")
           .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles.length).toBe(13);
+          .then(({ body: { articles, total_count } }) => {
+            expect(total_count).toBe(13);
+            expect(articles.length).toBe(10);
             articles.forEach((article) => {
               expect(article).toMatchObject({
                 article_id: expect.any(Number),
@@ -310,8 +317,9 @@ describe("GET /api/articles", () => {
         return request(app)
           .get("/api/articles?sort_by=comment_count&order=asc")
           .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles.length).toBe(13);
+          .then(({ body: { articles, total_count } }) => {
+            expect(total_count).toBe(13);
+            expect(articles.length).toBe(10);
             articles.forEach((article) => {
               expect(article).toMatchObject({
                 article_id: expect.any(Number),
@@ -388,12 +396,26 @@ describe("GET /api/articles", () => {
     });
 
     describe("Provide unvalid query", () => {
-      test("400: Responds with Bad Request! msg", () => {
+      test("200: Responds with an array of article objects sorted by date in descending order", () => {
         return request(app)
           .get("/api/articles?NotValidQuery")
-          .expect(400)
-          .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+          .expect(200)
+          .then(({ body: { articles, total_count } }) => {
+            expect(total_count).toBe(13);
+            expect(articles.length).toBe(10);
+            articles.forEach((article) => {
+              expect(article).toMatchObject({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(Number),
+              });
+            });
+            expect(articles).toBeSortedBy("created_at", { descending: true });
           });
       });
     });
@@ -404,8 +426,9 @@ describe("GET /api/articles", () => {
       return request(app)
         .get("/api/articles?topic=mitch")
         .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles.length).toBeGreaterThan(0);
+        .then(({ body: { articles, total_count } }) => {
+          expect(total_count).toBe(12);
+          expect(articles.length).toBe(10);
           articles.forEach((topic) => {
             expect(topic).toMatchObject({
               article_id: expect.any(Number),
@@ -426,8 +449,9 @@ describe("GET /api/articles", () => {
       return request(app)
         .get("/api/articles?topic=")
         .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles.length).toBe(13);
+        .then(({ body: { articles, total_count } }) => {
+          expect(total_count).toBe(13);
+          expect(articles.length).toBe(10);
           articles.forEach((article) => {
             expect(article).toMatchObject({
               article_id: expect.any(Number),
@@ -448,8 +472,9 @@ describe("GET /api/articles", () => {
       return request(app)
         .get("/api/articles?topic=mitch&sort_by=author&order=asc")
         .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles.length).toBeGreaterThan(0);
+        .then(({ body: { articles, total_count } }) => {
+          expect(total_count).toBe(12);
+          expect(articles.length).toBe(10);
           articles.forEach((article) => {
             expect(article).toMatchObject({
               article_id: expect.any(Number),
@@ -470,8 +495,9 @@ describe("GET /api/articles", () => {
       return request(app)
         .get("/api/articles?topic=&sort_by=title&order=asc")
         .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles.length).toBeGreaterThan(0);
+        .then(({ body: { articles, total_count } }) => {
+          expect(total_count).toBe(13);
+          expect(articles.length).toBe(10);
           articles.forEach((article) => {
             expect(article).toMatchObject({
               article_id: expect.any(Number),
@@ -492,7 +518,8 @@ describe("GET /api/articles", () => {
       return request(app)
         .get("/api/articles?topic=paper")
         .expect(200)
-        .then(({ body: { articles } }) => {
+        .then(({ body: { articles, total_count } }) => {
+          expect(total_count).toBe(0);
           expect(articles).toEqual([]);
         });
     });
@@ -504,6 +531,182 @@ describe("GET /api/articles", () => {
         .then(({ body: { msg } }) => {
           expect(msg).toBe("topic Not Found!");
         });
+    });
+  });
+
+  describe("GET /api/articles (pagination)", () => {
+    describe("Status 200 tests", () => {
+      test("200: Respond with an object containing total_count and array of article objects limited the result by the provided limit", () => {
+        return request(app)
+          .get("/api/articles?limit=5&p=1")
+          .expect(200)
+          .then(({ body: { articles, total_count } }) => {
+            expect(total_count).toBe(13);
+            expect(articles.length).toBe(5);
+            articles.forEach((article) => {
+              expect(article).toMatchObject({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(Number),
+              });
+            });
+            expect(articles).toBeSortedBy("created_at", { descending: true });
+          });
+      });
+
+      test("200: Respond with correct object for limit = 1 and p = 3", () => {
+        return request(app)
+          .get("/api/articles?limit=1&p=3")
+          .expect(200)
+          .then(({ body: { articles, total_count } }) => {
+            expect(total_count).toBe(13);
+            expect(articles.length).toBe(1);
+            articles.forEach((article) => {
+              expect(article).toMatchObject({
+                article_id: 2,
+                title: "Sony Vaio; or, The Laptop",
+                topic: "mitch",
+                author: "icellusedkars",
+                created_at: "2020-10-16T05:03:00.000Z",
+                votes: 0,
+                article_img_url:
+                  "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                comment_count: 0,
+              });
+            });
+          });
+      });
+
+      test("200: Respond with total search result for total_count and empty array for article objects when p is beyond search results", () => {
+        return request(app)
+          .get("/api/articles?limit=15&p=6")
+          .expect(200)
+          .then(({ body: { articles, total_count } }) => {
+            expect(total_count).toBe(13);
+            expect(articles).toEqual([]);
+          });
+      });
+    });
+
+    describe("Not a Number test", () => {
+      test("400: Respond with Bad Request! msg When limit not a number but p is", () => {
+        return request(app)
+          .get("/api/articles?limit=NotNumber&p=2")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+
+      test("400: Respond with Bad Request! msg When p is a number but not limit", () => {
+        return request(app)
+          .get("/api/articles?limit=5&p=NotNumber")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+
+      test("400: Respond with Bad Request! msg When both limit and p are not number", () => {
+        return request(app)
+          .get("/api/articles?limit=NotNumber&p=NotNumber")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+    });
+
+    describe("Zero Number test", () => {
+      test("400: Respond with Bad Request! msg When limit is 0 but p is positive number", () => {
+        return request(app)
+          .get("/api/articles?limit=0&p=4")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+
+      test("400: Respond with Bad Request! msg When limit is positive number but p is 0", () => {
+        return request(app)
+          .get("/api/articles?limit=20&p=0")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+
+      test("400: Respond with Bad Request! msg When both limit and p are 0", () => {
+        return request(app)
+          .get("/api/articles?limit=0&p=0")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+    });
+
+    describe("Negative Number test", () => {
+      test("400: Respond with Bad Request! msg When limit is negative number but p is positive", () => {
+        return request(app)
+          .get("/api/articles?limit=-20&p=4")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+
+      test("400: Respond with Bad Request! msg When limit is positive number but p is negative", () => {
+        return request(app)
+          .get("/api/articles?limit=20&p=-2")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+
+      test("400: Respond with Bad Request! msg When both limit and p are negative numbers", () => {
+        return request(app)
+          .get("/api/articles?limit=-10&p=-2")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+    });
+
+    describe("limit= and/or p= test", () => {
+      test("400: Respond with Bad Request! msg When limit is empty but p is positive number", () => {
+        return request(app)
+          .get("/api/articles?limit=&p=4")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+
+      test("400: Respond with Bad Request! msg When limit is positive number but p is empty", () => {
+        return request(app)
+          .get("/api/articles?limit=20&p=")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+
+      test("400: Respond with Bad Request! msg When both limit and p are empty", () => {
+        return request(app)
+          .get("/api/articles?limit=&p=")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
     });
   });
 });
