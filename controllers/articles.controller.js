@@ -37,7 +37,7 @@ exports.getArticles = (req, res, next) => {
     return Promise.reject({ status: 400, msg: "Bad Request!" });
   }
 
-  const maxlimit = Math.min(limit, 100);
+  const restrictMaxLimit = Math.min(limit, 100);
   const offset = limit * (p - 1);
 
   if (topic) {
@@ -46,7 +46,7 @@ exports.getArticles = (req, res, next) => {
       sort_by,
       order,
       topic,
-      maxlimit,
+      restrictMaxLimit,
       offset
     );
 
@@ -56,7 +56,7 @@ exports.getArticles = (req, res, next) => {
       })
       .catch(next);
   } else {
-    return selectArticles(sort_by, order, topic, maxlimit, offset)
+    return selectArticles(sort_by, order, topic, restrictMaxLimit, offset)
       .then((result) => {
         res.status(200).send(result);
       })

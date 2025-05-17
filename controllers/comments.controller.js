@@ -9,8 +9,21 @@ const { checkUser } = require("../models/users.model");
 
 exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
+  const { limit = 10, p = 1 } = req.query;
+
+  if (limit < 1 || p < 1) {
+    return Promise.reject({ status: 400, msg: "Bad Request!" });
+  }
+
+  const restrictMaxLimit = Math.min(limit, 100);
+  const offset = limit * (p - 1);
+
   const pendingArticle = selectArticleById(article_id);
-  const pendingComments = selectCommentsByArticleId(article_id);
+  const pendingComments = selectCommentsByArticleId(
+    article_id,
+    restrictMaxLimit,
+    offset
+  );
 
   Promise.all([pendingComments, pendingArticle])
     .then(([comments]) => {
