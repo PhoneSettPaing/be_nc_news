@@ -1,10 +1,10 @@
 const db = require("../db/connection");
 
-exports.selectCommentsByArticleId = (article_id, limit, p) => {
+exports.selectCommentsByArticleId = (article_id, restrictMaxLimit, offset) => {
   return db
     .query(
       `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3;`,
-      [article_id, limit, p]
+      [article_id, restrictMaxLimit, offset]
     )
     .then(({ rows }) => {
       return rows;
