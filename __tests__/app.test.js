@@ -885,51 +885,243 @@ describe("POST /api/articles", () => {
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
-  test("200: Responds with an array of comments for the given article_id sorted by date in descending order", () => {
-    return request(app)
-      .get("/api/articles/5/comments")
-      .expect(200)
-      .then(({ body: { comments } }) => {
-        expect(comments.length).toBe(2);
-        comments.forEach((comment) => {
-          expect(comment).toMatchObject({
-            comment_id: expect.any(Number),
-            article_id: 5,
-            body: expect.any(String),
-            votes: expect.any(Number),
-            author: expect.any(String),
-            created_at: expect.any(String),
+  describe("Tests (without any pagination)", () => {
+    test("200: Responds with an array of comments for the given article_id sorted by date in descending order", () => {
+      return request(app)
+        .get("/api/articles/5/comments")
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments.length).toBe(2);
+          comments.forEach((comment) => {
+            expect(comment).toMatchObject({
+              comment_id: expect.any(Number),
+              article_id: 5,
+              body: expect.any(String),
+              votes: expect.any(Number),
+              author: expect.any(String),
+              created_at: expect.any(String),
+            });
           });
+          expect(comments).toBeSortedBy("created_at", { descending: true });
         });
-        expect(comments).toBeSortedBy("created_at", { descending: true });
-      });
+    });
+
+    test("200: Resopnd with an empty array when given article_id does not have any comments", () => {
+      return request(app)
+        .get("/api/articles/2/comments")
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).toEqual([]);
+        });
+    });
+
+    test("404: Respond with article_id Not Found! msg when valid article_id provided but provided id not exist in database due to id being out of range", () => {
+      return request(app)
+        .get("/api/articles/50000/comments")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("article_id Not Found!");
+        });
+    });
+
+    test("400: Respond with Bad Request! msg when invalid article_id provided", () => {
+      return request(app)
+        .get("/api/articles/NotArticleId/comments")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad Request!");
+        });
+    });
   });
 
-  test("200: Resopnd with an empty array when given article_id does not have any comments", () => {
-    return request(app)
-      .get("/api/articles/2/comments")
-      .expect(200)
-      .then(({ body: { comments } }) => {
-        expect(comments).toEqual([]);
+  describe("Tests for paginations", () => {
+    describe("Status 200 tests", () => {
+      test("200 Responds with an array of comments for the given article_id sorted by date in descending order paginated by the default limit=10 and p=1", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments.length).toBe(10);
+            comments.forEach((comment) => {
+              expect(comment).toMatchObject({
+                comment_id: expect.any(Number),
+                article_id: 1,
+                body: expect.any(String),
+                votes: expect.any(Number),
+                author: expect.any(String),
+                created_at: expect.any(String),
+              });
+            });
+            expect(comments).toBeSortedBy("created_at", { descending: true });
+          });
       });
+
+      test("200 Responds with an array of comments for the given article_id sorted by date in descending order paginated by the given limit=3 and p=1", () => {
+        return request(app)
+          .get("/api/articles/1/comments?limit=3&p=1")
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments.length).toBe(3);
+            comments.forEach((comment) => {
+              expect(comment).toMatchObject({
+                comment_id: expect.any(Number),
+                article_id: 1,
+                body: expect.any(String),
+                votes: expect.any(Number),
+                author: expect.any(String),
+                created_at: expect.any(String),
+              });
+            });
+            expect(comments).toBeSortedBy("created_at", { descending: true });
+          });
+      });
+
+      test("200 Responds with an array of comments for the given article_id sorted by date in descending order paginated by the given limit=5 and p=3", () => {
+        return request(app)
+          .get("/api/articles/1/comments?limit=5&p=3")
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments.length).toBe(1);
+            comments.forEach((comment) => {
+              expect(comment).toMatchObject({
+                comment_id: expect.any(Number),
+                article_id: 1,
+                body: expect.any(String),
+                votes: expect.any(Number),
+                author: expect.any(String),
+                created_at: expect.any(String),
+              });
+            });
+            expect(comments).toBeSortedBy("created_at", { descending: true });
+          });
+      });
+
+      test("200: Respond with an empty array for comments when p is beyond search results", () => {
+        return request(app)
+          .get("/api/articles/1/comments?limit=12&p=6")
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments.length).toBe(0);
+            expect(comments).toEqual([]);
+          });
+      });
+    });
+
+    describe("Not a Number test", () => {
+      test("400: Respond with Bad Request! msg When limit not a number but p is", () => {
+        return request(app)
+          .get("/api/articles/3/comments?limit=NotNumber&p=4")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+
+      test("400: Respond with Bad Request! msg When p not a number but limit is", () => {
+        return request(app)
+          .get("/api/articles/5/comments?limit=5&p=NotNumber")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+
+      test("400: Respond with Bad Request! msg When both limit and p is not a number", () => {
+        return request(app)
+          .get("/api/articles/2/comments?limit=NotNumber&p=NotNumber")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+    });
+
+    describe("Zero Number test", () => {
+      test("400: Respond with Bad Request! msg When limit is 0 but p is positive number", () => {
+        return request(app)
+          .get("/api/articles/3/comments?limit=0&p=2")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+
+      test("400: Respond with Bad Request! msg When limit is positive a number but p is 0", () => {
+        return request(app)
+          .get("/api/articles/2/comments?limit=5&p=0")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+
+      test("400: Respond with Bad Request! msg When both limit and p are 0", () => {
+        return request(app)
+          .get("/api/articles/1/comments?limit=0&p=0")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+    });
+
+    describe("Negative Number test", () => {
+      test("400: Respond with Bad Request! msg When limit is negative number but p is positive", () => {
+        return request(app)
+          .get("/api/articles/1/comments?limit=-20&p=4")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+
+      test("400: Respond with Bad Request! msg When limit is positive number but p is negative", () => {
+        return request(app)
+          .get("/api/articles/2/comments?limit=20&p=-2")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+
+      test("400: Respond with Bad Request! msg When both limit and p are negative numbers", () => {
+        return request(app)
+          .get("/api/articles/4/comments?limit=-10&p=-2")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Bad Request!");
+          });
+      });
+    });
   });
 
-  test("404: Respond with article_id Not Found! msg when valid article_id provided but provided id not exist in database due to id being out of range", () => {
-    return request(app)
-      .get("/api/articles/50000/comments")
-      .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("article_id Not Found!");
-      });
-  });
+  describe("limit= and/or p= test", () => {
+    test("400: Respond with Bad Request! msg When limit is empty but p is positive number", () => {
+      return request(app)
+        .get("/api/articles/3/comments?limit=&p=4")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad Request!");
+        });
+    });
 
-  test("400: Respond with Bad Request! msg when invalid article_id provided", () => {
-    return request(app)
-      .get("/api/articles/NotArticleId/comments")
-      .expect(400)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!");
-      });
+    test("400: Respond with Bad Request! msg When limit is positive number but p is empty", () => {
+      return request(app)
+        .get("/api/articles/1/comments?limit=20&p=")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad Request!");
+        });
+    });
+
+    test("400: Respond with Bad Request! msg When both limit and p are empty", () => {
+      return request(app)
+        .get("/api/articles/2/comments?limit=&p=")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad Request!");
+        });
+    });
   });
 });
 
