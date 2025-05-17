@@ -10,18 +10,11 @@ exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params;
   const { comment_count } = req.query;
 
-  if (
-    Object.keys(req.query).length === 0 ||
-    Object.keys(req.query).includes("comment_count")
-  ) {
-    return selectArticleById(article_id, comment_count)
-      .then((article) => {
-        res.status(200).send({ article });
-      })
-      .catch(next);
-  } else {
-    return Promise.reject({ status: 400, msg: "Bad Request!" });
-  }
+  return selectArticleById(article_id, comment_count)
+    .then((article) => {
+      res.status(200).send({ article });
+    })
+    .catch(next);
 };
 
 exports.getArticles = (req, res, next) => {
@@ -33,7 +26,25 @@ exports.getArticles = (req, res, next) => {
     p = 1,
   } = req.query;
 
-  if (limit < 1 || p < 1) {
+  const validSort = [
+    "article_id",
+    "title",
+    "topic",
+    "author",
+    "created_at",
+    "votes",
+    "article_img_url",
+    "comment_count",
+  ];
+
+  const validOrder = ["asc", "desc"];
+
+  if (
+    !validSort.includes(sort_by) ||
+    !validOrder.includes(order) ||
+    limit < 1 ||
+    p < 1
+  ) {
     return Promise.reject({ status: 400, msg: "Bad Request!" });
   }
 

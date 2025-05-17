@@ -26,19 +26,7 @@ exports.selectArticleById = (article_id, comment_count) => {
   }
 };
 
-exports.selectArticles = (sort_by, order, topic, limit, p) => {
-  const validSort = [
-    "article_id",
-    "title",
-    "topic",
-    "author",
-    "created_at",
-    "votes",
-    "article_img_url",
-    "comment_count",
-  ];
-  const validOrder = ["asc", "desc"];
-
+exports.selectArticles = (sort_by, order, topic, restrictMaxLimit, offset) => {
   const selectQuery =
     "SELECT a.article_id, a.title, a.topic, a.author, a.created_at, a.votes, a.article_img_url, COUNT(c.comment_id)::INT AS comment_count FROM articles a LEFT JOIN comments c on a.article_id = c.article_id ";
   const groupByOrderByQuery = format(
@@ -46,12 +34,12 @@ exports.selectArticles = (sort_by, order, topic, limit, p) => {
     sort_by,
     order
   );
-  const limitOffsetQuery = format("LIMIT %L OFFSET %L;", limit, p);
+  const limitOffsetQuery = format(
+    "LIMIT %L OFFSET %L;",
+    restrictMaxLimit,
+    offset
+  );
   const countQuery = "SELECT COUNT(*)::INT FROM articles ";
-
-  if (!validSort.includes(sort_by) || !validOrder.includes(order)) {
-    return Promise.reject({ status: 400, msg: "Bad Request!" });
-  }
 
   if (topic) {
     const whereQuery = format("WHERE topic = %L ", topic);

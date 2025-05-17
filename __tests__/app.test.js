@@ -51,6 +51,97 @@ describe("GET /api/topics", () => {
   });
 });
 
+describe("POST /api/topics", () => {
+  test("201: Respond with the added topic", () => {
+    const postObj = {
+      slug: "New Topic",
+      description: "New Description",
+    };
+
+    return request(app)
+      .post("/api/topics")
+      .send(postObj)
+      .expect(201)
+      .then(({ body: { topic } }) => {
+        expect(topic).toMatchObject({
+          slug: "New Topic",
+          description: "New Description",
+          img_url: null,
+        });
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when trying to add topic with already existing slug in database", () => {
+    const postObj = {
+      slug: "mitch",
+      description: "Already exist slug",
+    };
+
+    return request(app)
+      .post("/api/topics")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when trying to add topic with empty object in post object", () => {
+    const postObj = {};
+
+    return request(app)
+      .post("/api/topics")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when trying to add topic without slug property in post object", () => {
+    const postObj = {
+      description: "Greate Topic",
+    };
+
+    return request(app)
+      .post("/api/topics")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when trying to add topic without description property in post object", () => {
+    const postObj = {
+      slug: "New Topic",
+    };
+
+    return request(app)
+      .post("/api/topics")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when trying to add topic with wrong data type in post object", () => {
+    const postObj = {
+      slug: [1, 2, 3],
+      description: "Not Good topic",
+    };
+
+    return request(app)
+      .post("/api/topics")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+});
+
 describe("GET /api/articles/:article_id", () => {
   describe("GET /api/articles/:article_id (without queries)", () => {
     test("200: Responds with object of article information filtered by provide article_id", () => {
@@ -92,7 +183,7 @@ describe("GET /api/articles/:article_id", () => {
   });
 
   describe("GET /api/articles/:article_id?comment_count", () => {
-    test("200: Responds with object of article information  including comment_count filtered by provide article_id", () => {
+    test("200: Responds with object of article information including comment_count filtered by provide article_id", () => {
       return request(app)
         .get("/api/articles/4?comment_count")
         .expect(200)
@@ -112,12 +203,22 @@ describe("GET /api/articles/:article_id", () => {
         });
     });
 
-    test("400: Responds with Bad Request! msg When unvaild query is given", () => {
+    test("200: Responds with object of article information filtered by provide article_id When unvaild query is given", () => {
       return request(app)
         .get("/api/articles/4?NotVaildQuery")
-        .expect(400)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("Bad Request!");
+        .expect(200)
+        .then(({ body: { article } }) => {
+          expect(article).toMatchObject({
+            article_id: 4,
+            title: "Student SUES Mitch!",
+            topic: "mitch",
+            author: "rogersop",
+            body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+            created_at: expect.any(String),
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
         });
     });
 
@@ -1193,7 +1294,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 
-  test("400: Respond with Bad Request!! msg when trying to add comment without empty object in post object", () => {
+  test("400: Respond with Bad Request!! msg when trying to add comment with empty object in post object", () => {
     const postObj = {};
 
     return request(app)
@@ -1205,7 +1306,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 
-  test("400: Respond with Bad Request!! msg when trying to add comment without username object in post object", () => {
+  test("400: Respond with Bad Request!! msg when trying to add comment without username property in post object", () => {
     const postObj = {
       body: "Greate Article",
     };
@@ -1219,7 +1320,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 
-  test("400: Respond with Bad Request!! msg when trying to add comment without body object in post object", () => {
+  test("400: Respond with Bad Request!! msg when trying to add comment without body property in post object", () => {
     const postObj = {
       username: "lurker",
     };
