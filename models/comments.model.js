@@ -11,11 +11,11 @@ exports.selectCommentsByArticleId = (article_id, restrictMaxLimit, offset) => {
     });
 };
 
-exports.insertCommentByArticleId = (article_id, body) => {
+exports.insertCommentByArticleId = (article_id, body, username) => {
   return db
     .query(
-      `INSERT INTO comments (article_id, body, author) VALUES ($1, $2, (SELECT author FROM articles WHERE article_id = $1)) RETURNING *`,
-      [article_id, body]
+      `INSERT INTO comments (article_id, body, author) VALUES ($1, $2, $3) RETURNING *`,
+      [article_id, body, username]
     )
     .then(({ rows }) => {
       return rows[0];

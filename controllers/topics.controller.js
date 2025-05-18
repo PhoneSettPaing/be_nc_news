@@ -9,8 +9,16 @@ exports.getTopics = (req, res) => {
 exports.postTopic = (req, res, next) => {
   const { slug, description } = req.body;
 
-  if (typeof slug !== "string" || typeof description !== "string") {
-    return Promise.reject({ status: 400, msg: "Bad Request!" });
+  if (
+    typeof slug !== "string" ||
+    typeof description !== "string" ||
+    !slug.trim() ||
+    !description.trim()
+  ) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid data type or missing slug and/or description !",
+    });
   }
 
   return insertTopic(slug, description)

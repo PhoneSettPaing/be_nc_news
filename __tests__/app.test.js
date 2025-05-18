@@ -71,7 +71,7 @@ describe("POST /api/topics", () => {
       });
   });
 
-  test("400: Respond with Bad Request! msg when trying to add topic with already existing slug in database", () => {
+  test("409: Respond with Topic/slug already exists! msg when trying to add topic with already existing slug in database", () => {
     const postObj = {
       slug: "mitch",
       description: "Already exist slug",
@@ -80,13 +80,13 @@ describe("POST /api/topics", () => {
     return request(app)
       .post("/api/topics")
       .send(postObj)
-      .expect(400)
+      .expect(409)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!");
+        expect(msg).toBe("Topic/slug already exists!");
       });
   });
 
-  test("400: Respond with Bad Request! msg when trying to add topic with empty object in post object", () => {
+  test("400: Respond with Invalid data type or missing slug and/or description ! msg when trying to add topic with empty object in post object", () => {
     const postObj = {};
 
     return request(app)
@@ -94,11 +94,13 @@ describe("POST /api/topics", () => {
       .send(postObj)
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!");
+        expect(msg).toBe(
+          "Invalid data type or missing slug and/or description !"
+        );
       });
   });
 
-  test("400: Respond with Bad Request! msg when trying to add topic without slug property in post object", () => {
+  test("400: Respond with Invalid data type or missing slug and/or description ! msg when trying to add topic without slug property in post object", () => {
     const postObj = {
       description: "Greate Topic",
     };
@@ -108,11 +110,13 @@ describe("POST /api/topics", () => {
       .send(postObj)
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!");
+        expect(msg).toBe(
+          "Invalid data type or missing slug and/or description !"
+        );
       });
   });
 
-  test("400: Respond with Bad Request! msg when trying to add topic without description property in post object", () => {
+  test("400: Respond with Invalid data type or missing slug and/or description ! msg when trying to add topic without description property in post object", () => {
     const postObj = {
       slug: "New Topic",
     };
@@ -122,11 +126,13 @@ describe("POST /api/topics", () => {
       .send(postObj)
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!");
+        expect(msg).toBe(
+          "Invalid data type or missing slug and/or description !"
+        );
       });
   });
 
-  test("400: Respond with Bad Request! msg when trying to add topic with wrong data type in post object", () => {
+  test("400: Respond with Invalid data type or missing slug and/or description ! msg when trying to add topic with wrong data type in post object", () => {
     const postObj = {
       slug: [1, 2, 3],
       description: "Not Good topic",
@@ -137,108 +143,27 @@ describe("POST /api/topics", () => {
       .send(postObj)
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!");
+        expect(msg).toBe(
+          "Invalid data type or missing slug and/or description !"
+        );
       });
   });
-});
 
-describe("GET /api/articles/:article_id", () => {
-  describe("GET /api/articles/:article_id (without queries)", () => {
-    test("200: Responds with object of article information filtered by provide article_id", () => {
-      return request(app)
-        .get("/api/articles/4")
-        .expect(200)
-        .then(({ body: { article } }) => {
-          expect(article).toMatchObject({
-            article_id: 4,
-            title: "Student SUES Mitch!",
-            topic: "mitch",
-            author: "rogersop",
-            body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
-            created_at: expect.any(String),
-            votes: 0,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          });
-        });
-    });
+  test("400: Respond with Invalid data type or missing slug and/or description ! msg when trying to add topic with empty string values in post object", () => {
+    const postObj = {
+      slug: "",
+      description: " ",
+    };
 
-    test("404: Respond with article_id Not Found! msg when valid article_id provided but article with provided id not exist in database due to id being out of range", () => {
-      return request(app)
-        .get("/api/articles/10000")
-        .expect(404)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("article_id Not Found!");
-        });
-    });
-
-    test("400: Respond with Bad Request! msg when invalid article_id provided", () => {
-      return request(app)
-        .get("/api/articles/NotArticleId")
-        .expect(400)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("Bad Request!");
-        });
-    });
-  });
-
-  describe("GET /api/articles/:article_id?comment_count", () => {
-    test("200: Responds with object of article information including comment_count filtered by provide article_id", () => {
-      return request(app)
-        .get("/api/articles/4?comment_count")
-        .expect(200)
-        .then(({ body: { article } }) => {
-          expect(article).toMatchObject({
-            article_id: 4,
-            title: "Student SUES Mitch!",
-            topic: "mitch",
-            author: "rogersop",
-            body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
-            created_at: expect.any(String),
-            votes: 0,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-            comment_count: expect.any(Number),
-          });
-        });
-    });
-
-    test("200: Responds with object of article information filtered by provide article_id When unvaild query is given", () => {
-      return request(app)
-        .get("/api/articles/4?NotVaildQuery")
-        .expect(200)
-        .then(({ body: { article } }) => {
-          expect(article).toMatchObject({
-            article_id: 4,
-            title: "Student SUES Mitch!",
-            topic: "mitch",
-            author: "rogersop",
-            body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
-            created_at: expect.any(String),
-            votes: 0,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          });
-        });
-    });
-
-    test("404: Respond with article_id Not Found! msg when valid article_id provided but id being out of range", () => {
-      return request(app)
-        .get("/api/articles/10000?comment_count")
-        .expect(404)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("article_id Not Found!");
-        });
-    });
-
-    test("400: Respond with Bad Request! msg when invalid article_id provided", () => {
-      return request(app)
-        .get("/api/articles/NotArticleId?comment_count")
-        .expect(400)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("Bad Request!");
-        });
-    });
+    return request(app)
+      .post("/api/topics")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe(
+          "Invalid data type or missing slug and/or description !"
+        );
+      });
   });
 });
 
@@ -438,65 +363,65 @@ describe("GET /api/articles", () => {
       });
     });
 
-    describe("Provide unvalid sort_by and valid order or valid sort_by and unvalid order or both unvalid sort_by and order", () => {
-      test("400: Responds with Bad Request! msg with unvalid sort_by but valid order", () => {
+    describe("Provide invalid sort_by and valid order or valid sort_by and invalid order or both invalid sort_by and order", () => {
+      test("400: Responds with Invalid sort_by or order ! msg with invalid sort_by but valid order", () => {
         return request(app)
           .get("/api/articles?sort_by=NotValidSort&order=asc")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe("Invalid sort_by or order !");
           });
       });
 
-      test("400: Responds with Bad Request! msg with valid sort_by but unvalid order", () => {
+      test("400: Responds with Invalid sort_by or order ! msg with valid sort_by but invalid order", () => {
         return request(app)
           .get("/api/articles?sort_by=author&order=NotValidOrder")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe("Invalid sort_by or order !");
           });
       });
 
-      test("400: Responds with Bad Request! msg with both unvalid sort_by and order", () => {
+      test("400: Responds with Invalid sort_by or order ! msg with both invalid sort_by and order", () => {
         return request(app)
           .get("/api/articles?sort_by=NotValidSort&order=NotValidOrder")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe("Invalid sort_by or order !");
           });
       });
     });
 
     describe("Provide empty sort_by or empty order or both empty sort_by and order", () => {
-      test("400: Responds with Bad Request! msg with empty sort_by", () => {
+      test("400: Responds with Invalid sort_by or order ! msg with empty sort_by", () => {
         return request(app)
           .get("/api/articles?sort_by=")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe("Invalid sort_by or order !");
           });
       });
 
-      test("400: Responds with Bad Request! msg with empty order", () => {
+      test("400: Responds with Invalid sort_by or order ! msg with empty order", () => {
         return request(app)
           .get("/api/articles?order=")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe("Invalid sort_by or order !");
           });
       });
 
-      test("400: Responds with Bad Request! msg with empty order", () => {
+      test("400: Responds with Invalid sort_by or order ! msg with empty order", () => {
         return request(app)
           .get("/api/articles?sort_by=&order=")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe("Invalid sort_by or order !");
           });
       });
     });
 
-    describe("Provide unvalid query", () => {
+    describe("Provide invalid query", () => {
       test("200: Responds with an array of article objects sorted by date in descending order", () => {
         return request(app)
           .get("/api/articles?NotValidQuery")
@@ -724,88 +649,106 @@ describe("GET /api/articles", () => {
     });
 
     describe("Zero Number test", () => {
-      test("400: Respond with Bad Request! msg When limit is 0 but p is positive number", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When limit is 0 but p is positive number", () => {
         return request(app)
           .get("/api/articles?limit=0&p=4")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
           });
       });
 
-      test("400: Respond with Bad Request! msg When limit is positive number but p is 0", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When limit is positive number but p is 0", () => {
         return request(app)
           .get("/api/articles?limit=20&p=0")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
           });
       });
 
-      test("400: Respond with Bad Request! msg When both limit and p are 0", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When both limit and p are 0", () => {
         return request(app)
           .get("/api/articles?limit=0&p=0")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
           });
       });
     });
 
     describe("Negative Number test", () => {
-      test("400: Respond with Bad Request! msg When limit is negative number but p is positive", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When limit is negative number but p is positive", () => {
         return request(app)
           .get("/api/articles?limit=-20&p=4")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
           });
       });
 
-      test("400: Respond with Bad Request! msg When limit is positive number but p is negative", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When limit is positive number but p is negative", () => {
         return request(app)
           .get("/api/articles?limit=20&p=-2")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
           });
       });
 
-      test("400: Respond with Bad Request! msg When both limit and p are negative numbers", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When both limit and p are negative numbers", () => {
         return request(app)
           .get("/api/articles?limit=-10&p=-2")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
           });
       });
     });
 
     describe("limit= and/or p= test", () => {
-      test("400: Respond with Bad Request! msg When limit is empty but p is positive number", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When limit is empty but p is positive number", () => {
         return request(app)
           .get("/api/articles?limit=&p=4")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
           });
       });
 
-      test("400: Respond with Bad Request! msg When limit is positive number but p is empty", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When limit is positive number but p is empty", () => {
         return request(app)
           .get("/api/articles?limit=20&p=")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
           });
       });
 
-      test("400: Respond with Bad Request! msg When both limit and p are empty", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When both limit and p are empty", () => {
         return request(app)
           .get("/api/articles?limit=&p=")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
           });
       });
     });
@@ -868,7 +811,7 @@ describe("POST /api/articles", () => {
       });
   });
 
-  test("400: Respond with Bad Request! msg when trying to add an article with author(username) not included in database", () => {
+  test("404: Respond with author(username) Not Found! msg when trying to add an article with author(username) not included in database", () => {
     const postObj = {
       author: "NotIncludedAuthor",
       title: "Test Title",
@@ -880,13 +823,13 @@ describe("POST /api/articles", () => {
     return request(app)
       .post("/api/articles")
       .send(postObj)
-      .expect(400)
+      .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!");
+        expect(msg).toBe("author(username) Not Found!");
       });
   });
 
-  test("400: Respond with Bad Request! msg when trying to add an article with topic(slug) not included in database", () => {
+  test("404: Respond with topic(slug) Not Found! msg when trying to add an article with topic(slug) not included in database", () => {
     const postObj = {
       author: "rogersop",
       title: "Test Title",
@@ -898,13 +841,13 @@ describe("POST /api/articles", () => {
     return request(app)
       .post("/api/articles")
       .send(postObj)
-      .expect(400)
+      .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!");
+        expect(msg).toBe("topic(slug) Not Found!");
       });
   });
 
-  test("400: Respond with Bad Request! msg when post object is empty", () => {
+  test("400: Respond with Invalid data type or missing fields! msg when post object is empty", () => {
     const postObj = {};
 
     return request(app)
@@ -912,11 +855,11 @@ describe("POST /api/articles", () => {
       .send(postObj)
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!");
+        expect(msg).toBe("Invalid data type or missing fields!");
       });
   });
 
-  test("400: Respond with Bad Request! msg when post object doesn't include author", () => {
+  test("400: Respond with Invalid data type or missing fields! msg when post object doesn't include author", () => {
     const postObj = {
       title: "Test Title",
       body: "Test Body",
@@ -929,11 +872,11 @@ describe("POST /api/articles", () => {
       .send(postObj)
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!");
+        expect(msg).toBe("Invalid data type or missing fields!");
       });
   });
 
-  test("400: Respond with Bad Request! msg when post object doesn't include topic", () => {
+  test("400: Respond with Invalid data type or missing fields! msg when post object doesn't include topic", () => {
     const postObj = {
       author: "rogersop",
       title: "Test Title",
@@ -946,11 +889,11 @@ describe("POST /api/articles", () => {
       .send(postObj)
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!");
+        expect(msg).toBe("Invalid data type or missing fields!");
       });
   });
 
-  test("400: Respond with Bad Request! msg when post object doesn't include title", () => {
+  test("400: Respond with Invalid data type or missing fields! msg when post object doesn't include title", () => {
     const postObj = {
       author: "rogersop",
       body: "Test Body",
@@ -963,11 +906,11 @@ describe("POST /api/articles", () => {
       .send(postObj)
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!");
+        expect(msg).toBe("Invalid data type or missing fields!");
       });
   });
 
-  test("400: Respond with Bad Request! msg when post object doesn't include body", () => {
+  test("400: Respond with Invalid data type or missing fields! msg when post object doesn't include body", () => {
     const postObj = {
       author: "rogersop",
       title: "Test Title",
@@ -980,7 +923,247 @@ describe("POST /api/articles", () => {
       .send(postObj)
       .expect(400)
       .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid data type or missing fields!");
+      });
+  });
+
+  test("400: Respond with Invalid data type or missing fields! msg when post object has invalid data type", () => {
+    const postObj = {
+      author: 123,
+      title: "Test Title",
+      body: true,
+      topic: "mitch",
+      article_img_url: [1234],
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid data type or missing fields!");
+      });
+  });
+
+  test("400: Respond with Invalid data type or missing fields! msg when post object has empty string for values", () => {
+    const postObj = {
+      author: "icellusedkars",
+      title: "  ",
+      body: "  ",
+      topic: "mitch",
+      article_img_url: "  ",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid data type or missing fields!");
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id", () => {
+  describe("GET /api/articles/:article_id (without queries)", () => {
+    test("200: Responds with object of article information filtered by provide article_id", () => {
+      return request(app)
+        .get("/api/articles/4")
+        .expect(200)
+        .then(({ body: { article } }) => {
+          expect(article).toMatchObject({
+            article_id: 4,
+            title: "Student SUES Mitch!",
+            topic: "mitch",
+            author: "rogersop",
+            body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+            created_at: expect.any(String),
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
+
+    test("404: Respond with article_id Not Found! msg when valid article_id provided but provided id not exist in database due to id being out of range", () => {
+      return request(app)
+        .get("/api/articles/10000")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("article_id Not Found!");
+        });
+    });
+
+    test("400: Respond with Bad Request! msg when invalid article_id provided", () => {
+      return request(app)
+        .get("/api/articles/NotArticleId")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad Request!");
+        });
+    });
+  });
+
+  describe("GET /api/articles/:article_id?comment_count", () => {
+    test("200: Responds with object of article information including comment_count filtered by provide article_id", () => {
+      return request(app)
+        .get("/api/articles/4?comment_count")
+        .expect(200)
+        .then(({ body: { article } }) => {
+          expect(article).toMatchObject({
+            article_id: 4,
+            title: "Student SUES Mitch!",
+            topic: "mitch",
+            author: "rogersop",
+            body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+            created_at: expect.any(String),
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: expect.any(Number),
+          });
+        });
+    });
+
+    test("200: Responds with object of article information filtered by provide article_id When unvaild query is given", () => {
+      return request(app)
+        .get("/api/articles/4?NotVaildQuery")
+        .expect(200)
+        .then(({ body: { article } }) => {
+          expect(article).toMatchObject({
+            article_id: 4,
+            title: "Student SUES Mitch!",
+            topic: "mitch",
+            author: "rogersop",
+            body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+            created_at: expect.any(String),
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
+
+    test("404: Respond with article_id Not Found! msg when valid article_id provided but id being out of range", () => {
+      return request(app)
+        .get("/api/articles/10000?comment_count")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("article_id Not Found!");
+        });
+    });
+
+    test("400: Respond with Bad Request! msg when invalid article_id provided", () => {
+      return request(app)
+        .get("/api/articles/NotArticleId?comment_count")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad Request!");
+        });
+    });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Respond with an updated article object with updated votes for given article_id (given positive votes)", () => {
+    const patchObj = {
+      inc_votes: 5,
+    };
+
+    return request(app)
+      .patch("/api/articles/4")
+      .send(patchObj)
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article).toMatchObject({
+          article_id: 4,
+          title: "Student SUES Mitch!",
+          topic: "mitch",
+          author: "rogersop",
+          body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+          created_at: expect.any(String),
+          votes: 5,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+
+  test("200: Respond with an updated article object with updated votes for given article_id (given negative votes)", () => {
+    const patchObj = {
+      inc_votes: -15,
+    };
+
+    return request(app)
+      .patch("/api/articles/6")
+      .send(patchObj)
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article).toMatchObject({
+          article_id: 6,
+          title: "A",
+          topic: "mitch",
+          author: "icellusedkars",
+          body: "Delicious tin of cat food",
+          created_at: expect.any(String),
+          votes: -15,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+
+  test("404: Respond with article_id Not Found! msg when trying to update article with an article_id that's out of range", () => {
+    const patchObj = {
+      inc_votes: 2,
+    };
+
+    return request(app)
+      .patch("/api/articles/1000")
+      .send(patchObj)
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("article_id Not Found!");
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when trying to update article with votes that is not a number", () => {
+    const patchObj = {
+      inc_votes: "Not A Number",
+    };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(patchObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
         expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when trying to update article with valid votes but invalid article_id ", () => {
+    const patchObj = {
+      inc_votes: 10,
+    };
+
+    return request(app)
+      .patch("/api/articles/NotArticleId")
+      .send(patchObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("400: Respond with Missing required field: inc_votes ! msg when trying to update article with empty patch object", () => {
+    const patchObj = {};
+
+    return request(app)
+      .patch("/api/articles/3")
+      .send(patchObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Missing required field: inc_votes !");
       });
   });
 });
@@ -1138,90 +1321,108 @@ describe("GET /api/articles/:article_id/comments", () => {
     });
 
     describe("Zero Number test", () => {
-      test("400: Respond with Bad Request! msg When limit is 0 but p is positive number", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When limit is 0 but p is positive number", () => {
         return request(app)
           .get("/api/articles/3/comments?limit=0&p=2")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
           });
       });
 
-      test("400: Respond with Bad Request! msg When limit is positive a number but p is 0", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When limit is positive a number but p is 0", () => {
         return request(app)
           .get("/api/articles/2/comments?limit=5&p=0")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
           });
       });
 
-      test("400: Respond with Bad Request! msg When both limit and p are 0", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When both limit and p are 0", () => {
         return request(app)
           .get("/api/articles/1/comments?limit=0&p=0")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
           });
       });
     });
 
     describe("Negative Number test", () => {
-      test("400: Respond with Bad Request! msg When limit is negative number but p is positive", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When limit is negative number but p is positive", () => {
         return request(app)
           .get("/api/articles/1/comments?limit=-20&p=4")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
           });
       });
 
-      test("400: Respond with Bad Request! msg When limit is positive number but p is negative", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When limit is positive number but p is negative", () => {
         return request(app)
           .get("/api/articles/2/comments?limit=20&p=-2")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
           });
       });
 
-      test("400: Respond with Bad Request! msg When both limit and p are negative numbers", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When both limit and p are negative numbers", () => {
         return request(app)
           .get("/api/articles/4/comments?limit=-10&p=-2")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Bad Request!");
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
           });
       });
     });
-  });
 
-  describe("limit= and/or p= test", () => {
-    test("400: Respond with Bad Request! msg When limit is empty but p is positive number", () => {
-      return request(app)
-        .get("/api/articles/3/comments?limit=&p=4")
-        .expect(400)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("Bad Request!");
-        });
-    });
+    describe("limit= and/or p= test", () => {
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When limit is empty but p is positive number", () => {
+        return request(app)
+          .get("/api/articles/3/comments?limit=&p=4")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
+          });
+      });
 
-    test("400: Respond with Bad Request! msg When limit is positive number but p is empty", () => {
-      return request(app)
-        .get("/api/articles/1/comments?limit=20&p=")
-        .expect(400)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("Bad Request!");
-        });
-    });
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When limit is positive number but p is empty", () => {
+        return request(app)
+          .get("/api/articles/1/comments?limit=20&p=")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
+          });
+      });
 
-    test("400: Respond with Bad Request! msg When both limit and p are empty", () => {
-      return request(app)
-        .get("/api/articles/2/comments?limit=&p=")
-        .expect(400)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("Bad Request!");
-        });
+      test("400: Respond with limit and p must be greater than or equal to 1 ! msg When both limit and p are empty", () => {
+        return request(app)
+          .get("/api/articles/2/comments?limit=&p=")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe(
+              "limit and p must be greater than or equal to 1 !"
+            );
+          });
+      });
     });
   });
 });
@@ -1264,25 +1465,10 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 
-  test("400: Respond with Bad Request! msg when trying to add comment to invalid article_id", () => {
-    const postObj = {
-      username: "lurker",
-      body: 12345,
-    };
-
-    return request(app)
-      .post("/api/articles/NotAnArticleId/comments")
-      .send(postObj)
-      .expect(400)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!");
-      });
-  });
-
   test("404: Respond with article_id Not Found! msg when trying to add comment to valid article_id but not exist in database", () => {
     const postObj = {
       username: "lurker",
-      body: 12345,
+      body: "Perfect article",
     };
 
     return request(app)
@@ -1294,7 +1480,22 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 
-  test("400: Respond with Bad Request!! msg when trying to add comment with empty object in post object", () => {
+  test("400: Respond with Bad Request! msg when trying to add comment to invalid article_id", () => {
+    const postObj = {
+      username: "lurker",
+      body: "Nice",
+    };
+
+    return request(app)
+      .post("/api/articles/NotAnArticleId/comments")
+      .send(postObj)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+
+  test("400: Respond with Invalid data type or missing username and/or body! msg when trying to add comment with empty object in post object", () => {
     const postObj = {};
 
     return request(app)
@@ -1302,11 +1503,11 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(postObj)
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!!");
+        expect(msg).toBe("Invalid data type or missing username and/or body!");
       });
   });
 
-  test("400: Respond with Bad Request!! msg when trying to add comment without username property in post object", () => {
+  test("400: Respond with Invalid data type or missing username and/or body! msg when trying to add comment without username property in post object", () => {
     const postObj = {
       body: "Greate Article",
     };
@@ -1316,11 +1517,11 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(postObj)
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!!");
+        expect(msg).toBe("Invalid data type or missing username and/or body!");
       });
   });
 
-  test("400: Respond with Bad Request!! msg when trying to add comment without body property in post object", () => {
+  test("400: Respond with Invalid data type or missing username and/or body! msg when trying to add comment without body property in post object", () => {
     const postObj = {
       username: "lurker",
     };
@@ -1330,115 +1531,37 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(postObj)
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!!");
+        expect(msg).toBe("Invalid data type or missing username and/or body!");
       });
   });
-});
 
-describe("PATCH /api/articles/:article_id", () => {
-  describe("Positive votes", () => {
-    test("200: Respond with an updated article object with updated votes for given article_id", () => {
-      const patchObj = {
-        inc_votes: 5,
-      };
-
-      return request(app)
-        .patch("/api/articles/4")
-        .send(patchObj)
-        .expect(200)
-        .then(({ body: { article } }) => {
-          expect(article).toMatchObject({
-            article_id: 4,
-            title: "Student SUES Mitch!",
-            topic: "mitch",
-            author: "rogersop",
-            body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
-            created_at: expect.any(String),
-            votes: 5,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          });
-        });
-    });
-  });
-
-  describe("Negative votes", () => {
-    test("200: Respond with an updated article object with updated votes for given article_id", () => {
-      const patchObj = {
-        inc_votes: -15,
-      };
-
-      return request(app)
-        .patch("/api/articles/6")
-        .send(patchObj)
-        .expect(200)
-        .then(({ body: { article } }) => {
-          expect(article).toMatchObject({
-            article_id: 6,
-            title: "A",
-            topic: "mitch",
-            author: "icellusedkars",
-            body: "Delicious tin of cat food",
-            created_at: expect.any(String),
-            votes: -15,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          });
-        });
-    });
-  });
-
-  test("400: Respond with Bad Request! msg when trying to update article with votes that is not a number", () => {
-    const patchObj = {
-      inc_votes: "Not A Number",
+  test("400: Respond with Invalid data type or missing username and/or body! msg when trying to add comment with wrong data type in post object", () => {
+    const postObj = {
+      username: "lurker",
+      body: 23445,
     };
 
     return request(app)
-      .patch("/api/articles/1")
-      .send(patchObj)
+      .post("/api/articles/6/comments")
+      .send(postObj)
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!");
+        expect(msg).toBe("Invalid data type or missing username and/or body!");
       });
   });
 
-  test("400: Respond with Bad Request! msg when trying to update article with valid votes but unvalid article_id ", () => {
-    const patchObj = {
-      inc_votes: 10,
+  test("400: Respond with Invalid data type or missing username and/or body! msg when trying to add comment with empty string value in post object", () => {
+    const postObj = {
+      username: "lurker",
+      body: "  ",
     };
 
     return request(app)
-      .patch("/api/articles/NotArticleId")
-      .send(patchObj)
+      .post("/api/articles/6/comments")
+      .send(postObj)
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!");
-      });
-  });
-
-  test("404: Respond with article_id Not Found! msg when trying to update article with an article_id that's out of range", () => {
-    const patchObj = {
-      inc_votes: 2,
-    };
-
-    return request(app)
-      .patch("/api/articles/1000")
-      .send(patchObj)
-      .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("article_id Not Found!");
-      });
-  });
-
-  test("400: Respond with Bad Request!! msg when trying to update article with empty patch object", () => {
-    const patchObj = {};
-
-    return request(app)
-      .patch("/api/articles/3")
-      .send(patchObj)
-      .expect(400)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!!");
+        expect(msg).toBe("Invalid data type or missing username and/or body!");
       });
   });
 });
@@ -1482,6 +1605,18 @@ describe("PATCH /api/comments/:comment_id", () => {
       });
   });
 
+  test("404: Respond with comment_id Not Found! msg when trying to update comment with a comment_id that's out of range", () => {
+    const patchObj = { inc_votes: 4 };
+
+    return request(app)
+      .patch("/api/comments/3000")
+      .send(patchObj)
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("comment_id Not Found!");
+      });
+  });
+
   test("400: Respond with Bad Request! msg when trying to update comment with votes that is not a number", () => {
     const patchObj = { inc_votes: "Not A Number" };
 
@@ -1506,19 +1641,7 @@ describe("PATCH /api/comments/:comment_id", () => {
       });
   });
 
-  test("404: Respond with comment_id Not Found! msg when trying to update comment with a comment_id that's out of range", () => {
-    const patchObj = { inc_votes: 4 };
-
-    return request(app)
-      .patch("/api/comments/3000")
-      .send(patchObj)
-      .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("comment_id Not Found!");
-      });
-  });
-
-  test("400: Respond with Bad Request!! msg when trying to update comment with empty patch object", () => {
+  test("400: Respond with Missing required field: inc_votes ! msg when trying to update comment with empty patch object", () => {
     const patchObj = {};
 
     return request(app)
@@ -1526,7 +1649,7 @@ describe("PATCH /api/comments/:comment_id", () => {
       .send(patchObj)
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request!!");
+        expect(msg).toBe("Missing required field: inc_votes !");
       });
   });
 });
