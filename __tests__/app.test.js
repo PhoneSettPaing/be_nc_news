@@ -1168,6 +1168,30 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
+describe("DELETE /api/articles/:article_id", () => {
+  test("204: When article with given article_id is deleted successfully", () => {
+    return request(app).delete("/api/articles/1").expect(204);
+  });
+
+  test("404: Respond with article_id Not Found! msg When given article_id is valid but it is not in database and out of range", () => {
+    return request(app)
+      .delete("/api/articles/10000")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("article_id Not Found!");
+      });
+  });
+
+  test("400: Respond with Bad Request! msg when invalid article_id is given", () => {
+    return request(app)
+      .delete("/api/articles/NotArticleId")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!");
+      });
+  });
+});
+
 describe("GET /api/articles/:article_id/comments", () => {
   describe("Tests (without any pagination)", () => {
     test("200: Responds with an array of comments for the given article_id sorted by date in descending order", () => {
@@ -1659,7 +1683,7 @@ describe("DELETE /api/comments/:comment_id", () => {
     return request(app).delete("/api/comments/2").expect(204);
   });
 
-  test("400: Respond with Bad Request! When unvalid comment_id is given", () => {
+  test("400: Respond with Bad Request! When invalid comment_id is given", () => {
     return request(app)
       .delete("/api/comments/NotCommentId")
       .expect(400)

@@ -96,6 +96,10 @@
       }
     }
   },
+  "DELETE /api/articles/:article_id": {
+    "description": "Delete an article with provided article_id",
+    "exampleResponse": {}
+  },
   "GET /api/articles/:article_id/comments": {
     "description": "serves an array of comments object filter by the provide article_id order by date",
     "queries": ["limit", "p"],

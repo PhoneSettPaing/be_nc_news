@@ -3,7 +3,12 @@ const {
   selectArticles,
   updateArticleById,
   insertArticle,
+  deleteArticleWithId,
 } = require("../models/articles.model");
+const {
+  selectCommentsByArticleId,
+  deleteCommentWithId,
+} = require("../models/comments.model");
 const { checkTopic } = require("../models/topics.model");
 
 exports.getArticleById = (req, res, next) => {
@@ -125,6 +130,26 @@ exports.postArticle = (req, res, next) => {
   return insertArticle(author, title, body, topic, article_img_url)
     .then((article) => {
       res.status(201).send({ article });
+    })
+    .catch(next);
+};
+
+exports.deleteArticleById = (req, res, next) => {
+  const { article_id } = req.params;
+
+  selectCommentsByArticleId(article_id)
+    .then((comments) => {
+      const deleteComments = comments.map((comment) =>
+        deleteCommentWithId(comment.comment_id)
+      );
+
+      return Promise.all(deleteComments);
+    })
+    .then(() => {
+      return deleteArticleWithId(article_id);
+    })
+    .then(() => {
+      res.status(204).send();
     })
     .catch(next);
 };
