@@ -92,3 +92,15 @@ exports.insertArticle = (author, title, body, topic, article_img_url) => {
       return this.selectArticleById(rows[0].article_id, (comment_count = ""));
     });
 };
+
+exports.deleteArticleWithId = (article_id) => {
+  return db
+    .query(`DELETE FROM articles WHERE article_id = $1 RETURNING *;`, [
+      article_id,
+    ])
+    .then(({ rows }) => {
+      if (!rows.length) {
+        return Promise.reject({ status: 404, msg: "article_id Not Found!" });
+      }
+    });
+};
