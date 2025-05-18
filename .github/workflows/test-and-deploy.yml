@@ -6,12 +6,15 @@ on:
       - main
 
 jobs:
+  greet:
+    name: NC News API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Greet
+        run: echo "👋 Hello, developer! Your CI is running."
+
   test:
     name: Test
-    runs-on: ubuntu-latest
-
-  lint:
-    name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
