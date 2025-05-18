@@ -23,7 +23,7 @@ app.use((err, req, res, next) => {
 
 //psql errorhandler
 app.use((err, req, res, next) => {
-  if (err.code === "22P02" || "23503") {
+  if (err.code === "22P02" || err.code === "23503" || err.code === "23505") {
     if (err.constraint === "comments_author_fkey") {
       res.status(404).send({ msg: "username Not Found!" });
     } else if (err.constraint === "comments_article_id_fkey") {
