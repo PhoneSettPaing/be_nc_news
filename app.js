@@ -12,7 +12,7 @@ app.all("/*splat", badUrl);
 
 //Start of error handling middleware chain
 
-//404 custom errorhandler
+//custom errorhandler
 app.use((err, req, res, next) => {
   if (err.status && err.msg) {
     res.status(err.status).send({ msg: err.msg });
@@ -21,10 +21,22 @@ app.use((err, req, res, next) => {
   }
 });
 
-//400 sql errorhandler
+//psql errorhandler
 app.use((err, req, res, next) => {
-  if (err.code === "22P02" || "23503" ) {
-    res.status(400).send({ msg: "Bad Request!" });
+  if (err.code === "22P02" || "23503") {
+    if (err.constraint === "comments_author_fkey") {
+      res.status(404).send({ msg: "username Not Found!" });
+    } else if (err.constraint === "comments_article_id_fkey") {
+      res.status(404).send({ msg: "article_id Not Found!" });
+    } else if (err.constraint === "articles_author_fkey") {
+      res.status(404).send({ msg: "author(username) Not Found!" });
+    } else if (err.constraint === "articles_topic_fkey") {
+      res.status(404).send({ msg: "topic(slug) Not Found!" });
+    } else if (err.constraint === "topics_pkey") {
+      res.status(409).send({ msg: "Topic/slug already exists!" });
+    } else {
+      res.status(400).send({ msg: "Bad Request!" });
+    }
   } else {
     next(err);
   }

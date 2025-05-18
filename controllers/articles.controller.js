@@ -39,13 +39,15 @@ exports.getArticles = (req, res, next) => {
 
   const validOrder = ["asc", "desc"];
 
-  if (
-    !validSort.includes(sort_by) ||
-    !validOrder.includes(order) ||
-    limit < 1 ||
-    p < 1
-  ) {
-    return Promise.reject({ status: 400, msg: "Bad Request!" });
+  if (!validSort.includes(sort_by) || !validOrder.includes(order)) {
+    return Promise.reject({ status: 400, msg: "Invalid sort_by or order !" });
+  }
+
+  if (limit < 1 || p < 1) {
+    return Promise.reject({
+      status: 400,
+      msg: "limit and p must be greater than or equal to 1 !",
+    });
   }
 
   const restrictMaxLimit = Math.min(limit, 100);
@@ -80,7 +82,10 @@ exports.patchArticleById = (req, res, next) => {
   const { inc_votes } = req.body;
 
   if (!inc_votes) {
-    return Promise.reject({ status: 400, msg: "Bad Request!!" });
+    return Promise.reject({
+      status: 400,
+      msg: "Missing required field: inc_votes !",
+    });
   }
 
   return updateArticleById(article_id, inc_votes)
@@ -98,6 +103,24 @@ exports.postArticle = (req, res, next) => {
     topic,
     article_img_url = "http://www.gravatar.com/avatar/?d=mp",
   } = req.body;
+
+  if (
+    typeof author !== "string" ||
+    typeof title !== "string" ||
+    typeof body !== "string" ||
+    typeof topic !== "string" ||
+    typeof article_img_url !== "string" ||
+    !author.trim() ||
+    !title.trim() ||
+    !body.trim() ||
+    !topic.trim() ||
+    !article_img_url.trim()
+  ) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid data type or missing fields!",
+    });
+  }
 
   return insertArticle(author, title, body, topic, article_img_url)
     .then((article) => {
