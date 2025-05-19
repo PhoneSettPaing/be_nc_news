@@ -2,6 +2,9 @@ const express = require("express");
 const app = express();
 const { badUrl } = require("./controllers/api.controller");
 const apiRouter = require("./routes/api-router");
+const cors = require("cors");
+
+app.use(cors());
 
 app.use(express.json());
 
