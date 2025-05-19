@@ -1,30 +1,31 @@
 # 📰 Northcoders News API
 
-A RESTful backend API for a Reddit-style news site. Built using **Node.js**, **Express**, and **PostgreSQL**, the API allows users to interact with articles, topics, comments, and users.
+A RESTful backend API for a Reddit-style news site. Built with **Node.js**, **Express**, and **PostgreSQL**, it allows users to fetch, create, update, and delete articles, topics, comments, and users — with full pagination, sorting, filtering, and robust error handling.
 
-This project was built as part of the **Northcoders Bootcamp Course** to demonstrate skills in backend architecture, RESTful routing, SQL data and error handling, and test-driven development.
+This project was built as part of the **Northcoders Bootcamp Course** to demonstrate skills in backend development, RESTful architecture, and test-driven development.
 
 <br/>
 
 ## 🚀 Live Demo
 
-👉 [Live API on Render](https://nc-news-qonp.onrender.com)
+👉 [Access the Live API on Render](https://nc-news-qonp.onrender.com/api)
+
+Use `/api` to view all available endpoints.
 
 <br/>
 
-## 📋 Summary
+## 📋 Features
 
-This API provides full CRUD functionality for Northcoders News platform, allowing clients to interact with articles, topics, comments, and users. It includes:
-- 📚 Retrieving all articles, topics, users, and comments
-- 🔍 Filtering, sorting, and paginating articles via query parameters (sort_by, order, topic, limit, p)
-- 📝 Creating new articles, topics, and comments
-- 🔺 Updating vote counts on articles and comments
-- ❌ Deleting individual comments and articles
-- 🚫 Graceful error handling for:
-    - Invalid or non-existent IDs
-    - Malformed requests
-    - Missing required fields
-    - Unsupported routes (404)
+- 📰 View articles, topics, users, and comments
+- 🔍 Filter and sort articles by query (`sort_by`, `order`, `topic`)
+- 📄 Pagination support via `limit` and `p`
+- ✍️ Post new articles, topics, and comments
+- ⬆️ Update votes on articles and comments
+- 🗑 Delete comments and articles
+- 🚫 Full error handling for:
+  - Invalid or missing parameters
+  - Non-existent routes or resources
+  - SQL and data validation errors
 
 <br/>
 
@@ -39,22 +40,20 @@ This API provides full CRUD functionality for Northcoders News platform, allowin
 
 <br/>
 
-## 📦 Features
+## 📦 Architecture
 
-- View all topics, articles, users, and comments
-- Filter and sort articles by query
-- Post new comments and articles
-- Update votes on articles/comments
-- Delete comments
-- Full error handling for common HTTP errors
-- Modular MVC architecture
+- **MVC pattern** (Models, Controllers, Routers)
+- Centralized error handling
 - Environment-specific configuration using `.env` files
+- Separate databases for development and test environments
 
 <br/>
 
 ## 📂 Database Schema
 
 Picture to add later
+
+The database includes tables for users, topics, articles, and comments with appropriate foreign key relationships and cascading deletes where applicable.
 
 <br/>
 
