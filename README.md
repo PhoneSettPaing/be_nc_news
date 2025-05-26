@@ -61,42 +61,73 @@ The database includes tables for users, topics, articles, and comments with appr
 
 ### 🔧 Prerequisites
 
-- **Node.js**: v20.11.1 or higher  
+- **Node.js**: v23.9.0 or higher  
 - **PostgreSQL**: v15 or higher
 
-### 🛠 Installation
+### 🛠 Installation & Setup
 
-1. Clone the repo:
+1. **Clone this repository**
+   ```bash
+   git clone https://github.com/PhoneSettPaing/be-nc-news.git
+   cd be-nc-news
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+
+   Create two `.env` files in the root directory:
+
+   For development:  **`.env.development`**
+   ```
+   PGDATABASE=nc_news
+   ```
+
+   For testing:  **`.env.test`**
+   ```
+   PGDATABASE=nc_news_test
+   ```
+
+4. **Create and seed your databases**
+   ```bash
+   npm run setup-dbs
+   npm run seed-dev
+   ```
+
+5. **Start the server locally**
+   ```bash
+   npm start
+   ```
+
+<br/>
+
+## 🧪 Running Tests
+
+Run all test suites using Jest and Supertest:
+
 ```bash
-git clone https://github.com/yourusername/be-nc-news.git
-cd be-nc-news
-Install dependencies:
-
-npm install
-Set up environment variables:
-
-Create two .env files:
-
-.env.development
-.env.test
-Inside each, add:
-
-PGDATABASE=your_db_name
-Set up and seed the databases:
-
-npm run setup-dbs
-npm run seed-dev
-Run the app:
-
-npm start
-🧪 Running Tests
 npm test
-Runs all test suites using Jest and Supertest, covering endpoints and error handling.
+```
 
-📖 API Endpoints
-Example: GET /api/articles
+Tests include:
+- ✅ Successful endpoints
+- ❌ Error handling (invalid input, bad routes, PSQL violations, etc.)
 
-Returns a list of articles with optional filters like sort_by, order, and topic.
+<br/>
 
-You can find full endpoint documentation in the /endpoints.json file or at /api once deployed.
+## 📖 API Documentation
+
+Once deployed or running locally, navigate to:
+
+```
+GET /api
+```
+
+This returns a full JSON object documenting all available endpoints, queries, and example responses.
+
+Alternatively, refer to the included [`endpoints.json`](./endpoints.json) file.
+
 
