@@ -68,7 +68,7 @@ The database includes tables for users, topics, articles, and comments with appr
 
 1. **Clone this repository**
    ```bash
-   git clone https://github.com/PhoneSettPaing/be-nc-news.git
+   git clone [https://github.com/PhoneSettPaing/be-nc-news.git](https://github.com/PhoneSettPaing/be_nc_news.git)
    cd be-nc-news
    ```
 
