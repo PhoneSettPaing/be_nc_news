@@ -51,7 +51,7 @@ Use `/api` to view all available endpoints.
 
 ## 📂 Database Schema
 
-Picture to add later
+![alt text](./nc-news-schema.png)
 
 The database includes tables for users, topics, articles, and comments with appropriate foreign key relationships and cascading deletes where applicable.
 
