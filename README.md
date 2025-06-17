@@ -1,3 +1,11 @@
+<p align="center"><a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=30&pause=1000&color=e60023&center=true&vCenter=true&width=840&height=100&lines=Built+with+Node.js%2C+Express.js+and+PostgreSQL." alt="Typing SVG" /></a></p>
+
+<div align="center">
+  
+[![Test & Deploy](https://github.com/PhoneSettPaing/be_nc_news/actions/workflows/test-and-deploy.yml/badge.svg?branch=main)](https://github.com/PhoneSettPaing/be_nc_news/actions/workflows/test-and-deploy.yml)
+
+</div>
+
 # 📰 Northcoders News API
 
 A RESTful backend API for a Reddit-style news site. Built with **Node.js**, **Express**, and **PostgreSQL**, it allows users to fetch, create, update, and delete articles, topics, comments, and users — with full pagination, sorting, filtering, and robust error handling.
@@ -31,12 +39,7 @@ Use `/api` to view all available endpoints.
 
 ## 🛠️ Tech Stack
 
-- **Node.js**
-- **Express**
-- **PostgreSQL**
-- **Jest** & **Supertest** (for TDD)
-- **pg** & **pg-format**
-- **dotenv**
+<p align="left"> <a href="https://github.com/alexandresanlim/Badges4-README.md-Profile" ><img src="https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E" alt="javascript" /></a> <a href="https://github.com/alexandresanlim/Badges4-README.md-Profile" ><img src="https://img.shields.io/badge/Node%20js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="node js" /></a> <a href="https://github.com/alexandresanlim/Badges4-README.md-Profile" ><img src="https://img.shields.io/badge/Express%20js-000000?style=for-the-badge&logo=express&logoColor=white" alt="express js" /></a> <a href="https://badges.pages.dev/" ><img src="https://img.shields.io/badge/.ENV-ECD53F?logo=dotenv&logoColor=000&style=for-the-badge" alt="dotenv" /></a> <a href="https://github.com/alexandresanlim/Badges4-README.md-Profile" ><img src="https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white" alt="jest" /></a> <a href="https://github.com/alexandresanlim/Badges4-README.md-Profile" ><img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="postgresql" /></a> <a href="https://github.com/alexandresanlim/Badges4-README.md-Profile" ><img src="https://img.shields.io/badge/Supabase-181818?style=for-the-badge&logo=supabase&logoColor=white" alt="supabase" /></a> <a href="https://github.com/alexandresanlim/Badges4-README.md-Profile" ><img src="https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="render" /></a> <a href="https://github.com/alexandresanlim/Badges4-README.md-Profile" ><img src="https://img.shields.io/badge/GIT-E44C30?style=for-the-badge&logo=git&logoColor=white" alt="git" /></a> <a href="https://github.com/alexandresanlim/Badges4-README.md-Profile" ><img src="https://img.shields.io/badge/Github%20Actions-282a2e?style=for-the-badge&logo=githubactions&logoColor=367cfe" alt="github action" /></a> <a href="https://github.com/alexandresanlim/Badges4-README.md-Profile" ><img src="https://img.shields.io/badge/VSCode-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white" alt="vscode" /></a> </p>
 
 <br/>
 
