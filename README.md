@@ -30,6 +30,8 @@ This project was built as part of the **Northcoders Bootcamp Course** to demonst
   - [📖 API Documentation](#-api-documentation)
     - [🔑 Core API Endpoints](#-core-api-endpoints)
 
+<br />
+
 ## 🚀 Live Demo
 
 👉 [Access the Live API on Render](https://nc-news-qonp.onrender.com/api)
