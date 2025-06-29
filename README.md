@@ -14,6 +14,22 @@ This project was built as part of the **Northcoders Bootcamp Course** to demonst
 
 <br/>
 
+## 📖 Table of Contents
+
+- [📰 Northcoders News API](#-northcoders-news-api)
+  - [📖 Table of Contents](#-table-of-contents)
+  - [🚀 Live Demo](#-live-demo)
+  - [📋 Features](#-features)
+  - [🛠️ Tech Stack](#️-tech-stack)
+  - [📦 Architecture](#-architecture)
+  - [📂 Database Schema](#-database-schema)
+  - [✅ Getting Started](#-getting-started)
+    - [🔧 Prerequisites](#-prerequisites)
+    - [🛠 Installation \& Setup](#-installation--setup)
+  - [🧪 Running Tests](#-running-tests)
+  - [📖 API Documentation](#-api-documentation)
+    - [🔑 Core API Endpoints](#-core-api-endpoints)
+
 ## 🚀 Live Demo
 
 👉 [Access the Live API on Render](https://nc-news-qonp.onrender.com/api)
@@ -64,18 +80,20 @@ The database includes tables for users, topics, articles, and comments with appr
 
 ### 🔧 Prerequisites
 
-- **Node.js**: v23.9.0 or higher  
+- **Node.js**: v23.9.0 or higher
 - **PostgreSQL**: v15 or higher
 
 ### 🛠 Installation & Setup
 
 1. **Clone this repository**
+
    ```bash
    git clone https://github.com/PhoneSettPaing/be_nc_news.git
    cd be-nc-news
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
@@ -84,17 +102,20 @@ The database includes tables for users, topics, articles, and comments with appr
 
    Create two `.env` files in the root directory:
 
-   For development:  **`.env.development`**
+   For development: **`.env.development`**
+
    ```
    PGDATABASE=nc_news
    ```
 
-   For testing:  **`.env.test`**
+   For testing: **`.env.test`**
+
    ```
    PGDATABASE=nc_news_test
    ```
 
 4. **Create and seed your databases**
+
    ```bash
    npm run setup-dbs
    npm run seed-dev
@@ -116,6 +137,7 @@ npm test
 ```
 
 Tests include:
+
 - ✅ Successful endpoints
 - ❌ Error handling (invalid input, bad routes, PSQL violations, etc.)
 
@@ -133,4 +155,26 @@ This returns a full JSON object documenting all available endpoints, queries, an
 
 Alternatively, refer to the included [`endpoints.json`](./endpoints.json) file.
 
+### 🔑 Core API Endpoints
 
+| Method | Endpoint                             | Description                                                          |
+| ------ | ------------------------------------ | -------------------------------------------------------------------- |
+| ALL    | `/*url`                              | Catch all invalid URLs and return 404 Not Found error                |
+| GET    | `/api`                               | Returns JSON of all available endpoints                              |
+| GET    | `/api/topics`                        | Get all topics                                                       |
+| POST   | `/api/topics`                        | Insert a topic                                                       |
+| GET    | `/api/articles`                      | Get all articles (supports queries: sort_by, order, topic, limit, p) |
+| POST   | `/api/articles`                      | Insert a new article                                                 |
+| GET    | `/api/articles/:article_id`          | Get a single article by article_id                                   |
+| PATCH  | `/api/articles/:article_id`          | Update article votes by article_id                                   |
+| DELETE | `/api/articles/:article_id`          | Delete an article by article_id                                      |
+| GET    | `/api/articles/:article_id/comments` | Get comments for a specific article (supports queries: limit, p)     |
+| POST   | `/api/articles/:article_id/comments` | Add a comment to a specific article                                  |
+| PATCH  | `/api/comments/:comment_id`          | Update votes for a comment by comment_id                             |
+| DELETE | `/api/comments/:comment_id`          | Delete a comment by comment_id                                       |
+| GET    | `/api/users`                         | Get all users                                                        |
+| GET    | `/api/users/:username`               | Get a single user by username                                        |
+
+---
+
+This project was built as part of the **Software Development Bootcamp in JavaScript** course provided by [**Northcoders**](https://www.northcoders.com/).
